@@ -135,7 +135,7 @@ def compute_emd(hist1, hist2):
 
 def compute_all_emd(panel_np1, panel_np2):
     emds = []
-    for i in range(6, panel_np1.shape[1]):
+    for i in range(panel_np1.shape[1]):
         hist1 = generate_histogram(panel_np1, i)
         hist2 = generate_histogram(panel_np2, i)
         emds.append(compute_emd(hist1, hist2))
@@ -182,7 +182,7 @@ def compute_all_emd_2d(panel_np1, panel_np2):
 
 ###################### PLOTTING ######################
 def plot_all_histograms(panel_np_1, panel_np_2):
-    num_channels = len(all_channels)
+    num_channels = panel_np_1.shape[1]
     
     # Create a figure with subplots, one for each channel
     fig, axs = plt.subplots(num_channels, 1, figsize=(8, 2*num_channels))
@@ -208,6 +208,24 @@ def plot_all_histograms(panel_np_1, panel_np_2):
 if __name__ == "__main__":
     b1 = load_data("Panel1")
     b2 = load_data("Panel2")
+    b3 = load_data("Panel1_x")
 
-    emd = compute_all_emd(b1, b2)
-    print(np.mean(emd))
+    # plot_all_histograms(b1, b2)
+
+    # print(b1.shape)
+    # print(b2.shape)
+
+    # emd = compute_all_emd(b1, b3)
+    # print(np.mean(emd))
+
+    # mean summaries
+    b1_mean = print_mean_summary(b1)
+    b2_mean = print_mean_summary(b2)
+    b3_mean = print_mean_summary(b3)
+
+    b12_diff = np.sum(np.abs(b1_mean - b2_mean))
+    b13_diff = np.sum(np.abs(b1_mean - b3_mean))
+
+    print("Mean Summary")
+    print("Panel1 vs Panel2: ", b12_diff)
+    print("Panel1 vs Panel1_x: ", b13_diff)
