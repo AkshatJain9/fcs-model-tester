@@ -17,7 +17,7 @@ all_channels = scatter_channels + fluro_channels
 transform = fk.transforms.LogicleTransform('logicle', param_t=262144, param_w=0.5, param_m=4.5, param_a=0)
 
 dataset = "Synthetic"
-processing_type = "autoencoder_cytonorm"
+processing_type = "rawdata"
 
 if (platform.system() == "Windows"):
     somepath = ".\\" + dataset + "\\" + processing_type + "\\"
@@ -33,12 +33,8 @@ def print_array(arr):
     print(np.array2string(arr, separator=', ', formatter={'float_kind':lambda x: f"{x:.2f}"}))
 
 def load_data(panel: str) -> np.ndarray:
-    if (platform.system() == "Windows"):
-        panel_root = somepath + panel + "\\"
-    else:
-        panel_root = somepath + panel + "/"
-
-    if (os.path.exists(panel + ".npy")):
+    panel_root = somepath
+    if (os.path.exists(panel_root + panel + ".npy")):
         return np.load(panel_root + panel + ".npy")
 
     # Recursively search for all .fcs files in the directory and subdirectories
@@ -139,7 +135,7 @@ def compute_emd(hist1, hist2):
 
 def compute_all_emd(panel_np1, panel_np2):
     emds = []
-    for i in range(6, len(all_channels)):
+    for i in range(6, panel_np1.shape[1]):
         hist1 = generate_histogram(panel_np1, i)
         hist2 = generate_histogram(panel_np2, i)
         emds.append(compute_emd(hist1, hist2))
@@ -210,5 +206,8 @@ def plot_all_histograms(panel_np_1, panel_np_2):
 
 
 if __name__ == "__main__":
-    b1 = "Panel1"
-    b2 = "Panel2"
+    b1 = load_data("Panel1")
+    b2 = load_data("Panel2")
+
+    emd = compute_all_emd(b1, b2)
+    print(np.mean(emd))
