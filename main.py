@@ -8,6 +8,9 @@ from sklearn.cluster import KMeans
 from scipy.spatial.distance import cdist
 from scipy.stats import wasserstein_distance
 from sklearn.neighbors import NearestNeighbors
+from sklearn.metrics import silhouette_score
+from scipy.optimize import linear_sum_assignment
+from sklearn.metrics import mean_squared_error
 
 
 ################# GLOBAL VARIABLES #################
@@ -216,23 +219,39 @@ def plot_all_histograms(panel_np_1, panel_np_2):
 
 
 ############# CELL POPULATIONS ################
-def get_main_cell_pops(data, k=15):
+def get_main_cell_pops(data, k):
     kmeans = KMeans(n_clusters=k, random_state=0).fit(data)
-    return kmeans.cluster_centers_
+    return kmeans.cluster_centers_, kmeans.labels_
 
 # Function to compute the average distance between two sets of cluster centers
 def average_cluster_distance(cluster_centers1, cluster_centers2):
-    # Compute pairwise distances between clusters of two datasets
-    distances = cdist(cluster_centers1, cluster_centers2, metric='euclidean')
+
+    # Initialize an array to hold the MSE values between each pair of centers
+    mse_matrix = np.zeros((cluster_centers1.shape[0], cluster_centers2.shape[0]))
     
-    # Get the minimum distance for each cluster in dataset1 to dataset2
-    min_distances = np.min(distances, axis=1)
+    # Calculate the MSE between each pair of centers
+    for i, centre in enumerate(cluster_centers1):
+        for j, transformed_centre in enumerate(cluster_centers2):
+            mse_matrix[i, j] = mean_squared_error(centre, transformed_centre)
     
-    # Return the average of these minimum distances
-    return np.mean(min_distances)
+    # Use the Hungarian algorithm to find the optimal matching
+    row_ind, col_ind = linear_sum_assignment(mse_matrix)
+    
+    # Create a list to hold the aligned center pairs and their MSE values
+    aligned_centers = []
+    for i, j in zip(row_ind, col_ind):
+        aligned_centers.append({
+            'x_centre_index': i,
+            'x_transformed_centre_index': j,
+            'mse': mse_matrix[i, j]
+        })
+    
+    mean_mse = np.mean([pair['mse'] for pair in aligned_centers])
+
+    return mean_mse
 
 ############ Shared Nearest Neighbours ############
-def shared_neighbors(data1, data2, k=5):
+def shared_neighbors(data1, data2, k=100):
     # Fit nearest neighbors for both datasets
     nbrs1 = NearestNeighbors(n_neighbors=k).fit(data2)
     nbrs2 = NearestNeighbors(n_neighbors=k).fit(data1)
@@ -330,9 +349,10 @@ def compute_all_metrics(reference_batch, target_batches):
 
         # Cluster Distance for all batches
         file.write("Average Cluster Distance:\n")
-        cluster_centers1 = get_main_cell_pops(reference_batch)
+        cluster_centers1, _ = get_main_cell_pops(reference_batch[:, 6:], 7)
+
         for batch_name, target_batch in target_batches.items():
-            cluster_centers2 = get_main_cell_pops(target_batch)
+            cluster_centers2, _ = get_main_cell_pops(target_batch[:, 6:], 7)
             cluster_dist = average_cluster_distance(cluster_centers1, cluster_centers2)
             file.write(f"Average Cluster Distance for {batch_name}: {cluster_dist}\n")
 
@@ -342,17 +362,10 @@ def compute_all_metrics(reference_batch, target_batches):
 if __name__ == "__main__":
     b1 = load_data("Panel1")
     b2 = load_data("Panel2")
-    b3 = load_data("transformed_data")
+    b3 = load_data("Panel1_x")
 
     d = dict()
-    d["Panel2"] = b2
-    d["Panel3"] = b3
+    d["Panel 2"] = b2
+    d["Panel 1 Transformed"] = b3
 
     compute_all_metrics(b1, d)
-
-    # b12_shared_neighbors = shared_neighbors(b1, b2)
-    # b13_shared_neighbors = shared_neighbors(b1, b3)
-
-    # print("Shared Neighbors")
-    # print("Panel1 vs Panel2: ", b12_shared_neighbors)
-    # print("Panel1 vs Panel1_x: ", b13_shared_neighbors)
