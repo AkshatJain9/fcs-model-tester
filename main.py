@@ -321,6 +321,9 @@ def compute_mahalanobis_shift(data1, data2, cluster_centers1, cluster_covs1, clu
         hist1, _ = np.histogram(data1_values, bins=50, range=(0, max_val))
         hist2, _ = np.histogram(data2_values, bins=50, range=(0, max_val))
 
+        hist1 = hist1 / np.sum(hist1)
+        hist2 = hist2 / np.sum(hist2)
+
         # Compute the TVD between the two histograms
         tvd = np.sum(np.abs(hist1 - hist2))
         shifts.append(tvd)
@@ -398,6 +401,7 @@ def compute_all_metrics(reference_batch, target_batches):
             tvds_fluoro = compute_all_tvd_2d(reference_batch, target_batch)
             file.write(f"2D TVD for {batch_name}:\n" + str(tvds_fluoro) + "\n")
             file.write(f"Mean 2D TVD for {batch_name}:\n" + str(np.mean(tvds_fluoro)) + "\n")
+        file.write("\n-------------------------\n")
 
         # Cluster Distance for all batches
         file.write("Average Cluster Distance:\n")
@@ -416,7 +420,7 @@ def compute_all_metrics(reference_batch, target_batches):
 if __name__ == "__main__":
     b1 = load_data("Panel1")
     b2 = load_data("Panel2")
-    b3 = load_data("Panel1_x")
+    b3 = load_data("Panel1_all")
 
     d = dict()
     d["Panel 2"] = b2
