@@ -11,6 +11,8 @@ from sklearn.neighbors import NearestNeighbors
 from sklearn.metrics import silhouette_score
 from scipy.optimize import linear_sum_assignment
 from sklearn.metrics import mean_squared_error
+from sklearn.mixture import GaussianMixture
+import torch
 
 
 ################# GLOBAL VARIABLES #################
@@ -220,8 +222,8 @@ def plot_all_histograms(panel_np_1, panel_np_2):
 
 ############# CELL POPULATIONS ################
 def get_main_cell_pops(data, k):
-    kmeans = KMeans(n_clusters=k, random_state=0).fit(data)
-    return kmeans.cluster_centers_, kmeans.labels_
+    gmm = GaussianMixture(n_components=k, random_state=0).fit(data)
+    return gmm.means_, gmm.covariances_, gmm.predict(data)
 
 # Function to compute the average distance between two sets of cluster centers
 def average_cluster_distance(cluster_centers1, cluster_centers2):
@@ -239,41 +241,32 @@ def average_cluster_distance(cluster_centers1, cluster_centers2):
     
     # Create a list to hold the aligned center pairs and their MSE values
     aligned_centers = []
+    correspondence_array = []
     for i, j in zip(row_ind, col_ind):
         aligned_centers.append({
             'x_centre_index': i,
             'x_transformed_centre_index': j,
             'mse': mse_matrix[i, j]
         })
+        correspondence_array.append([i, j])
     
     mean_mse = np.mean([pair['mse'] for pair in aligned_centers])
 
-    return mean_mse
+    return mean_mse, correspondence_array
 
-############ Shared Nearest Neighbours ############
-def shared_neighbors(data1, data2, k=100):
-    # Fit nearest neighbors for both datasets
-    nbrs1 = NearestNeighbors(n_neighbors=k).fit(data2)
-    nbrs2 = NearestNeighbors(n_neighbors=k).fit(data1)
+def kl_divergence(cov1, cov2):
+    n = cov1.shape[0]
+    logdet_cov2 = np.linalg.slogdet(cov2)[1]
+    logdet_cov1 = np.linalg.slogdet(cov1)[1]
+    inv_cov2 = np.linalg.inv(cov2)
+    trace_term = np.trace(np.matmul(inv_cov2, cov1))
+    return 0.5 * (trace_term + logdet_cov2 - logdet_cov1 - n)
 
-    # Find the nearest neighbors from data1 to data2 and from data2 to data1
-    _, indices1 = nbrs1.kneighbors(data1)  # Neighbors in data2 for each point in data1
-    _, indices2 = nbrs2.kneighbors(data2)  # Neighbors in data1 for each point in data2
-
-    mutual_neighbors = 0
+    # Calculate the difference between the two matrices
+    # difference = cov1 - cov2
     
-    # Iterate over each point in data1
-    for i in range(len(data1)):
-        for neighbor_idx in indices1[i]:  # Neighbors of data1[i] in data2
-            if i in indices2[neighbor_idx]:  # Check if the relationship is mutual
-                mutual_neighbors += 1
-
-    # Return the number of mutual nearest neighbors and the ratio
-    total_pairs = len(data1) * k
-    mnn_ratio = mutual_neighbors / total_pairs
-    
-    return mutual_neighbors, mnn_ratio
-
+    # # Calculate the Frobenius norm
+    # return np.sqrt(np.sum(np.abs(difference)**2))
 
 ###################### FINAL FUNCTION ######################
 def compute_all_metrics(reference_batch, target_batches):
@@ -287,74 +280,69 @@ def compute_all_metrics(reference_batch, target_batches):
             file.write(f"{batch_name}\n")
         file.write("\n-------------------------\n")
 
-        # Mean Summary for all batches
-        file.write("Mean Summaries:\n")
-        mean1 = print_mean_summary(reference_batch)
-        file.write("Mean Summary Reference Dataset:\n" + str(mean1) + "\n")
+        # # Mean Summary for all batches
+        # file.write("Mean Summaries:\n")
+        # mean1 = print_mean_summary(reference_batch)
+        # file.write("Mean Summary Reference Dataset:\n" + str(mean1) + "\n")
 
-        for batch_name, target_batch in target_batches.items():
-            mean2 = print_mean_summary(target_batch)
-            file.write(f"Mean Summary {batch_name}:\n" + str(mean2) + "\n")
-        file.write("\n-------------------------\n")
+        # for batch_name, target_batch in target_batches.items():
+        #     mean2 = print_mean_summary(target_batch)
+        #     file.write(f"Mean Summary {batch_name}:\n" + str(mean2) + "\n")
+        # file.write("\n-------------------------\n")
 
-        # MSE Difference in Means for all batches
-        file.write("MSE Difference in Means:\n")
-        for batch_name, target_batch in target_batches.items():
-            mean2 = print_mean_summary(target_batch)
-            mean_diff = np.mean((mean1 - mean2)**2)
-            file.write(f"MSE Difference for {batch_name}: {mean_diff}\n")
-        file.write("\n-------------------------\n")
+        # # MSE Difference in Means for all batches
+        # file.write("MSE Difference in Means:\n")
+        # for batch_name, target_batch in target_batches.items():
+        #     mean2 = print_mean_summary(target_batch)
+        #     mean_diff = np.mean((mean1 - mean2)**2)
+        #     file.write(f"MSE Difference for {batch_name}: {mean_diff}\n")
+        # file.write("\n-------------------------\n")
 
-        # Std Summary for all batches
-        file.write("Std Summaries:\n")
-        std1 = print_std_summary(reference_batch)
-        file.write("Std Summary Reference Dataset:\n" + str(std1) + "\n")
+        # # Std Summary for all batches
+        # file.write("Std Summaries:\n")
+        # std1 = print_std_summary(reference_batch)
+        # file.write("Std Summary Reference Dataset:\n" + str(std1) + "\n")
 
-        for batch_name, target_batch in target_batches.items():
-            std2 = print_std_summary(target_batch)
-            file.write(f"Std Summary {batch_name}:\n" + str(std2) + "\n")
-        file.write("\n-------------------------\n")
+        # for batch_name, target_batch in target_batches.items():
+        #     std2 = print_std_summary(target_batch)
+        #     file.write(f"Std Summary {batch_name}:\n" + str(std2) + "\n")
+        # file.write("\n-------------------------\n")
 
-        # MSE Difference in Std for all batches
-        file.write("MSE Difference in Standard Deviations:\n")
-        for batch_name, target_batch in target_batches.items():
-            std2 = print_std_summary(target_batch)
-            std_diff = np.mean((std1 - std2)**2)
-            file.write(f"MSE Difference for {batch_name}: {std_diff}\n")
-        file.write("\n-------------------------\n")
+        # # MSE Difference in Std for all batches
+        # file.write("MSE Difference in Standard Deviations:\n")
+        # for batch_name, target_batch in target_batches.items():
+        #     std2 = print_std_summary(target_batch)
+        #     std_diff = np.mean((std1 - std2)**2)
+        #     file.write(f"MSE Difference for {batch_name}: {std_diff}\n")
+        # file.write("\n-------------------------\n")
 
-        # 1D TVD for all batches
-        file.write("1D TVD for each feature:\n")
-        for batch_name, target_batch in target_batches.items():
-            tvds = compute_all_tvd(reference_batch, target_batch)
-            file.write(f"1D TVD for {batch_name}:\n" + str(tvds) + "\n")
-            file.write(f"Mean 1D TVD for {batch_name}:\n" + str(np.mean(tvds)) + "\n")
-        file.write("\n-------------------------\n")
+        # # 1D TVD for all batches
+        # file.write("1D TVD for each feature:\n")
+        # for batch_name, target_batch in target_batches.items():
+        #     tvds = compute_all_tvd(reference_batch, target_batch)
+        #     file.write(f"1D TVD for {batch_name}:\n" + str(tvds) + "\n")
+        #     file.write(f"Mean 1D TVD for {batch_name}:\n" + str(np.mean(tvds)) + "\n")
+        # file.write("\n-------------------------\n")
 
-        # 1D EMD for all batches
-        file.write("1D EMD for each feature:\n")
-        for batch_name, target_batch in target_batches.items():
-            emds = compute_all_emd(reference_batch, target_batch)
-            file.write(f"1D EMD for {batch_name}:\n" + str(emds) + "\n")
-            file.write(f"Mean 1D EMD for {batch_name}:\n" + str(np.mean(emds)) + "\n")
-        file.write("\n-------------------------\n")
-
-        # Shared Neighbors and MNN for all batches
-        file.write("Shared Neighbors and MNN:\n")
-        for batch_name, target_batch in target_batches.items():
-            shared_neighbors_count, shared_neighbors_ratio = shared_neighbors(reference_batch, target_batch)
-            file.write(f"Shared Neighbors Count for {batch_name}: {shared_neighbors_count}\n")
-            file.write(f"Shared Neighbors Ratio for {batch_name}: {shared_neighbors_ratio}\n")
-        file.write("\n-------------------------\n")
+        # # 1D EMD for all batches
+        # file.write("1D EMD for each feature:\n")
+        # for batch_name, target_batch in target_batches.items():
+        #     emds = compute_all_emd(reference_batch, target_batch)
+        #     file.write(f"1D EMD for {batch_name}:\n" + str(emds) + "\n")
+        #     file.write(f"Mean 1D EMD for {batch_name}:\n" + str(np.mean(emds)) + "\n")
+        # file.write("\n-------------------------\n")
 
         # Cluster Distance for all batches
         file.write("Average Cluster Distance:\n")
-        cluster_centers1, _ = get_main_cell_pops(reference_batch[:, 6:], 7)
+        cluster_centers1, cluster_cov1, _ = get_main_cell_pops(reference_batch[:, 6:], 7)
 
         for batch_name, target_batch in target_batches.items():
-            cluster_centers2, _ = get_main_cell_pops(target_batch[:, 6:], 7)
-            cluster_dist = average_cluster_distance(cluster_centers1, cluster_centers2)
+            cluster_centers2, cluster_cov2, _ = get_main_cell_pops(target_batch[:, 6:], 7)
+            cluster_dist, correspondence_arr = average_cluster_distance(cluster_centers1, cluster_centers2)
+            kl_divs = [kl_divergence(cluster_cov1[i], cluster_cov2[j]) for i, j in correspondence_arr]
+            kl_divs_mean = np.mean(kl_divs)
             file.write(f"Average Cluster Distance for {batch_name}: {cluster_dist}\n")
+            file.write(f"Average KL Divergence for {batch_name}: {kl_divs_mean}\n")
 
     print(f"Metrics summary saved to {file_name}")
 
@@ -362,7 +350,7 @@ def compute_all_metrics(reference_batch, target_batches):
 if __name__ == "__main__":
     b1 = load_data("Panel1")
     b2 = load_data("Panel2")
-    b3 = load_data("Panel1_x")
+    b3 = load_data("Panel1_frob")
 
     d = dict()
     d["Panel 2"] = b2
