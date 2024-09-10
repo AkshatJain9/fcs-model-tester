@@ -150,19 +150,6 @@ def compute_all_tvd(panel_np1, panel_np2):
         tvds.append(compute_tvd(hist1, hist2))
     return tvds
 
-
-###################### EMD ######################
-def compute_all_emd(panel_np1, panel_np2):
-    emds = []
-    for i in range(panel_np1.shape[1]):
-        min_val = np.min([np.min(panel_np1[:, i]), np.min(panel_np2[:, i])])
-        max_val = np.max([np.max(panel_np1[:, i]), np.max(panel_np2[:, i])])
-
-        hist1 = generate_histogram(panel_np1, i, min_val, max_val)
-        hist2 = generate_histogram(panel_np2, i, min_val, max_val)
-        emds.append(wasserstein_distance(hist1, hist2))
-    return emds
-
 ###################### 2D TVD ######################
 def gen_2d_histogram(panel_np, index1, index2, min_val, max_val):
     assert((index1 < 6 and index2 < 6) or (index1 >= 6 and index2 >= 6))
@@ -387,14 +374,6 @@ def compute_all_metrics(reference_batch, target_batches):
             file.write(f"Mean 1D TVD for {batch_name}:\n" + str(np.mean(tvds)) + "\n")
         file.write("\n-------------------------\n")
 
-        # 1D EMD for all batches
-        file.write("1D EMD for each feature:\n")
-        for batch_name, target_batch in target_batches.items():
-            emds = compute_all_emd(reference_batch, target_batch)
-            file.write(f"1D EMD for {batch_name}:\n" + str(emds) + "\n")
-            file.write(f"Mean 1D EMD for {batch_name}:\n" + str(np.mean(emds)) + "\n")
-        file.write("\n-------------------------\n")
-
         # 2D TVD for all batches
         file.write("2D TVD for each feature pair:\n")
         for batch_name, target_batch in target_batches.items():
@@ -419,12 +398,15 @@ def compute_all_metrics(reference_batch, target_batches):
 
 if __name__ == "__main__":
     b1 = load_data("Panel1")
+
+
+
     b2 = load_data("Panel2")
-    b3 = load_data("Panel1_all")
+    b3 = load_data("Panel1_s")
 
     d = dict()
     d["Panel 2"] = b2
-    d["Panel 1 Transformed"] = b3
+    d["Panel 3"] = b3
 
     compute_all_metrics(b1, d)
 
