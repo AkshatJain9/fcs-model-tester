@@ -4,15 +4,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import platform
 import glob
-from sklearn.cluster import KMeans
-from scipy.spatial.distance import cdist
-from scipy.stats import wasserstein_distance
-from sklearn.neighbors import NearestNeighbors
-from sklearn.metrics import silhouette_score
 from scipy.optimize import linear_sum_assignment
 from sklearn.metrics import mean_squared_error
 from sklearn.mixture import GaussianMixture
-import torch
 
 
 ################# GLOBAL VARIABLES #################
@@ -262,6 +256,7 @@ def compute_mahalanobis_values(data, cluster_centers, cluster_covs, batch_labels
     assigned_centers = cluster_centers[batch_labels]
     assigned_covs = cluster_covs[batch_labels]
     diff = data - assigned_centers
+    # return np.mean(diff ** 2, axis=1)
     inv_cov = np.linalg.inv(assigned_covs)
     mahalanobis_distances = np.einsum('bi,bij,bj->b', diff, inv_cov, diff)
     
@@ -310,6 +305,11 @@ def compute_mahalanobis_shift(data1, data2, cluster_centers1, cluster_covs1, clu
 
         hist1 = hist1 / np.sum(hist1)
         hist2 = hist2 / np.sum(hist2)
+
+        # Plot the histograms
+        plt.plot(hist1, label='Batch 1')
+        plt.plot(hist2)
+        plt.show()
 
         # Compute the TVD between the two histograms
         tvd = np.sum(np.abs(hist1 - hist2))
@@ -397,19 +397,43 @@ def compute_all_metrics(reference_batch, target_batches):
 
 
 if __name__ == "__main__":
+    # e2 = load_data("Plate 27902_N")
+    # e4 = load_data("Plate 28528_N")
+    # e7 = load_data("Plate 39630_N")
+
+    # e3 = load_data("Plate 28332")
+    # e5 = load_data("Plate 29178_N")
+
+
+    # e1 = load_data("Plate 19635 _CD8")
+
+    # e6 = load_data("Plate 36841")
+    
+
+    
+    # d = dict()
+    # d["Plate 28528_N"] = e4
+    # d["Plate 39630_N"] = e7
+    # d["Plate 28332"] = e3
+    # d["Plate 29178_N"] = e5
+    # d["Plate 19635 _CD8"] = e1
+    # d["Plate 36841"] = e6
+
+    # compute_all_metrics(e2, d)
+
+
     b1 = load_data("Panel1")
-
-
-
     b2 = load_data("Panel2")
-    b3 = load_data("Panel1_s")
+    # b3 = load_data("Panel3")
+    b4 = load_data("Panel1_random")
 
     d = dict()
     d["Panel 2"] = b2
-    d["Panel 3"] = b3
+    # d["Panel 3"] = b3
+    d["Panel 1 Transformed"] = b4
 
     compute_all_metrics(b1, d)
-
+    # plot_all_histograms(b1, b4)
     # data_1 = b3[:, 6]
     # data_2 = b3[:, 7]
 
