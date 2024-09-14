@@ -1,0 +1,10 @@
+Batches:
+Panel 2
+Panel 1 Transformed
+
+-------------------------
+Average Cluster Distance:
+Average Cluster Distance for Panel 2: 0.009417592555796763
+Average Mahalanobis Shift for Panel 2: 0.5127824821470363
+Average Cluster Distance for Panel 1 Transformed: 0.006345803979870272
+Average Mahalanobis Shift for Panel 1 Transformed: 1.797294774359574
