@@ -403,10 +403,10 @@ def compute_all_metrics(reference_batch, target_batches):
 
         # Cluster Distance for all batches
         file.write("Average Cluster Distance:\n")
-        cluster_centers1, cluster_cov1, batch_labels1 = get_main_cell_pops(reference_batch[:, 6:], 10)
+        cluster_centers1, cluster_cov1, batch_labels1 = get_main_cell_pops(reference_batch[:, 6:], 13)
 
         for batch_name, target_batch in target_batches.items():
-            cluster_centers2, cluster_cov2, batch_labels2 = get_main_cell_pops(target_batch[:, 6:], 10)
+            cluster_centers2, cluster_cov2, batch_labels2 = get_main_cell_pops(target_batch[:, 6:], 13)
             cluster_dist, correspondence_arr = average_cluster_distance(cluster_centers1, cluster_centers2)
             mahalaonbis_shift = compute_mahalanobis_shift(reference_batch[:, 6:], target_batch[:, 6:], cluster_centers1, cluster_cov1, cluster_centers2, cluster_cov2, batch_labels1, batch_labels2, correspondence_arr)
             file.write(f"Average Cluster Distance for {batch_name}: {cluster_dist}\n")
@@ -484,7 +484,7 @@ if __name__ == "__main__":
     
     b2 = load_data("Panel2")
     # b3 = load_data("Panel3")
-    b4 = load_data("Panel1_sinkhorn")
+    b4 = load_data("Panel1_var")
 
     d = dict()
     d["Panel 2"] = b2
