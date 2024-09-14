@@ -7,6 +7,8 @@ import glob
 from scipy.optimize import linear_sum_assignment
 from sklearn.metrics import mean_squared_error
 from sklearn.mixture import GaussianMixture
+from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score
 
 
 ################# GLOBAL VARIABLES #################
@@ -271,11 +273,11 @@ def compute_mahalanobis_values(data, cluster_centers, cluster_covs, batch_labels
     assigned_centers = cluster_centers[batch_labels]
     mse = np.mean((data - assigned_centers)**2, axis=1)
 
-    assigned_covs = cluster_covs[batch_labels]
-    diff = data - assigned_centers
-    # return np.mean(diff ** 2, axis=1)
-    inv_cov = np.linalg.inv(assigned_covs)
-    mahalanobis_distances = np.einsum('bi,bij,bj->b', diff, inv_cov, diff)
+    # assigned_covs = cluster_covs[batch_labels]
+    # diff = data - assigned_centers
+    # # return np.mean(diff ** 2, axis=1)
+    # inv_cov = np.linalg.inv(assigned_covs)
+    # mahalanobis_distances = np.einsum('bi,bij,bj->b', diff, inv_cov, diff)
     
     # Compute histograms for each cluster
     values = []
@@ -325,11 +327,6 @@ def compute_mahalanobis_shift(data1, data2, cluster_centers1, cluster_covs1, clu
 
         # Show the histograms
         plt.plot(hist1)
-        plt.plot(hist2)
-        plt.show()
-
-        # Plot the histograms
-        plt.plot(hist1, label='Batch 1')
         plt.plot(hist2)
         plt.show()
 
@@ -406,16 +403,55 @@ def compute_all_metrics(reference_batch, target_batches):
 
         # Cluster Distance for all batches
         file.write("Average Cluster Distance:\n")
-        cluster_centers1, cluster_cov1, batch_labels1 = get_main_cell_pops(reference_batch[:, 6:], 7)
+        cluster_centers1, cluster_cov1, batch_labels1 = get_main_cell_pops(reference_batch[:, 6:], 10)
 
         for batch_name, target_batch in target_batches.items():
-            cluster_centers2, cluster_cov2, batch_labels2 = get_main_cell_pops(target_batch[:, 6:], 7)
+            cluster_centers2, cluster_cov2, batch_labels2 = get_main_cell_pops(target_batch[:, 6:], 10)
             cluster_dist, correspondence_arr = average_cluster_distance(cluster_centers1, cluster_centers2)
             mahalaonbis_shift = compute_mahalanobis_shift(reference_batch[:, 6:], target_batch[:, 6:], cluster_centers1, cluster_cov1, cluster_centers2, cluster_cov2, batch_labels1, batch_labels2, correspondence_arr)
             file.write(f"Average Cluster Distance for {batch_name}: {cluster_dist}\n")
             file.write(f"Average Mahalanobis Shift for {batch_name}: {mahalaonbis_shift}\n")
 
     print(f"Metrics summary saved to {file_name}")
+
+
+########## K MEANS CLUSTERING ############
+def find_optimal_k(data, max_k):
+    """
+    Find the optimal k for k-means clustering using silhouette score and plot the results.
+    
+    Parameters:
+    data (numpy.ndarray): 2D array of data points
+    max_k (int): Maximum number of clusters to try
+    
+    Returns:
+    int: Optimal number of clusters
+    """
+    silhouette_scores = []
+    k_values = range(2, max_k + 1)
+    
+    # Try k from 2 to max_k
+    for k in k_values:
+        kmeans = KMeans(n_clusters=k, random_state=42)
+        cluster_labels = kmeans.fit_predict(data)
+        
+        silhouette_avg = silhouette_score(data, cluster_labels)
+        silhouette_scores.append(silhouette_avg)
+    
+    # Find the index of the maximum silhouette score
+    optimal_k = silhouette_scores.index(max(silhouette_scores)) + 2
+    
+    # Plot the silhouette scores
+    plt.figure(figsize=(10, 6))
+    plt.plot(k_values, silhouette_scores, 'bo-')
+    plt.xlabel('Number of Clusters (k)')
+    plt.ylabel('Silhouette Score')
+    plt.title('Silhouette Score vs. Number of Clusters')
+    plt.axvline(x=optimal_k, color='r', linestyle='--', label=f'Optimal k = {optimal_k}')
+    plt.legend()
+    plt.show()
+    
+    return optimal_k
 
 
 if __name__ == "__main__":
@@ -445,13 +481,13 @@ if __name__ == "__main__":
 
 
     b1 = load_data("Panel1")
+    
     b2 = load_data("Panel2")
     # b3 = load_data("Panel3")
-    b4 = load_data("Panel1_random")
+    b4 = load_data("Panel1_sinkhorn")
 
     d = dict()
-    # d["Panel 2"] = b2
-    # d["Panel 1 Transformed"] = b3
+    d["Panel 2"] = b2
     d["Panel 1 Transformed"] = b4
 
     compute_all_metrics(b1, d)
