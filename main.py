@@ -258,19 +258,31 @@ def compute_mahalanobis_values(data, cluster_centers, cluster_covs, batch_labels
         - mahalanobis_distances: 1D tensor of Mahalanobis distances for each sample
         - histograms: 2D tensor of histograms for each cluster
     """
-    # Compute the Mahalanobis distance for each point to its assigned cluster center
-    assigned_centers = cluster_centers[batch_labels]
-    assigned_covs = cluster_covs[batch_labels]
-    diff = data - assigned_centers
-    inv_cov = np.linalg.inv(assigned_covs)
-    mahalanobis_distances = np.einsum('bi,bij,bj->b', diff, inv_cov, diff)
+    # # Compute the Mahalanobis distance for each point to its assigned cluster center
+    # assigned_centers = cluster_centers[batch_labels]
+    # assigned_covs = cluster_covs[batch_labels]
+    # diff = data - assigned_centers
+    # inv_cov = np.linalg.inv(assigned_covs)
+    # mahalanobis_distances = np.einsum('bi,bij,bj->b', diff, inv_cov, diff)
     
+    # # Compute histograms for each cluster
+    # values = []
+    # for label in range(cluster_centers.shape[0]):
+    #     cluster_samples = mahalanobis_distances[batch_labels == label]
+    #     values.append(cluster_samples)
+    
+    # return values
+
+    # Compute MSE between each point and its assigned cluster center
+    assigned_centers = cluster_centers[batch_labels]
+    mse = np.mean((data - assigned_centers)**2, axis=1)
+
     # Compute histograms for each cluster
     values = []
     for label in range(cluster_centers.shape[0]):
-        cluster_samples = mahalanobis_distances[batch_labels == label]
+        cluster_samples = mse[batch_labels == label]
         values.append(cluster_samples)
-    
+
     return values
 
 
@@ -310,6 +322,11 @@ def compute_mahalanobis_shift(data1, data2, cluster_centers1, cluster_covs1, clu
 
         hist1 = hist1 / np.sum(hist1)
         hist2 = hist2 / np.sum(hist2)
+
+        # Show the histograms
+        plt.plot(hist1)
+        plt.plot(hist2)
+        plt.show()
 
         # Compute the TVD between the two histograms
         tvd = np.sum(np.abs(hist1 - hist2))
@@ -398,17 +415,15 @@ def compute_all_metrics(reference_batch, target_batches):
 
 if __name__ == "__main__":
     b1 = load_data("Panel1")
-
-
-
-    b2 = load_data("Panel2")
-    b3 = load_data("Panel1_s")
+    # b2 = load_data("Panel2")
+    b3 = load_data("Panel1_var10")
 
     d = dict()
-    d["Panel 2"] = b2
-    d["Panel 3"] = b3
+    # d["Panel 2"] = b2
+    d["Panel 1 Transformed"] = b3
 
     compute_all_metrics(b1, d)
+    # plot_all_histograms(b1, b3)
 
     # data_1 = b3[:, 6]
     # data_2 = b3[:, 7]
