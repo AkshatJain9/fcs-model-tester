@@ -22,7 +22,7 @@ all_channels = scatter_channels + fluro_channels
 transform = fk.transforms.LogicleTransform('logicle', param_t=262144, param_w=0.5, param_m=4.5, param_a=0)
 
 dataset = "Synthetic"
-processing_type = "rawdata"
+processing_type = "CytoRUV"
 
 if (platform.system() == "Windows"):
     somepath = ".\\" + dataset + "\\" + processing_type + "\\"
@@ -326,9 +326,9 @@ def compute_mahalanobis_shift(data1, data2, cluster_centers1, cluster_covs1, clu
         hist2 = hist2 / np.sum(hist2)
 
         # Show the histograms
-        plt.plot(hist1)
-        plt.plot(hist2)
-        plt.show()
+        # plt.plot(hist1)
+        # plt.plot(hist2)
+        # plt.show()
 
         # Compute the TVD between the two histograms
         tvd = np.sum(np.abs(hist1 - hist2))
@@ -483,12 +483,12 @@ if __name__ == "__main__":
     b1 = load_data("Panel1")
     
     b2 = load_data("Panel2")
-    # b3 = load_data("Panel3")
-    b4 = load_data("Panel1_var")
+    b3 = load_data("Panel3")
+    # b4 = load_data("Panel1_var")
 
     d = dict()
     d["Panel 2"] = b2
-    d["Panel 1 Transformed"] = b4
+    d["Panel 3"] = b3
 
     compute_all_metrics(b1, d)
     # plot_all_histograms(b1, b3)
