@@ -22,7 +22,7 @@ all_channels = scatter_channels + fluro_channels
 transform = fk.transforms.LogicleTransform('logicle', param_t=262144, param_w=0.5, param_m=4.5, param_a=0)
 
 dataset = "Synthetic"
-processing_type = "CytoRUV"
+processing_type = "CytofBatchAdjust"
 
 if (platform.system() == "Windows"):
     somepath = ".\\" + dataset + "\\" + processing_type + "\\"
@@ -37,9 +37,9 @@ def print_array(arr):
     np.set_printoptions(threshold=np.inf, linewidth=np.inf)
     print(np.array2string(arr, separator=', ', formatter={'float_kind':lambda x: f"{x:.2f}"}))
 
-def load_data(panel: str) -> np.ndarray:
+def load_data(panel: str, load_orig: bool = False) -> np.ndarray:
     panel_root = somepath
-    if (os.path.exists(panel_root + panel + ".npy")):
+    if (not load_orig and os.path.exists(panel_root + panel + ".npy")):
         return np.load(panel_root + panel + ".npy")
 
     # Recursively search for all .fcs files in the directory and subdirectories
@@ -454,6 +454,27 @@ def find_optimal_k(data, max_k):
     return optimal_k
 
 
+def cytofBatchAdjust(ref_batch, target_batches):
+    # For each clolumn, find the mean and variance of that column in the reference batch, and map the column in each target batch to the reference batch
+    # For each column, find the mean and variance of that column in the reference batch
+    ref_means = np.mean(ref_batch, axis=0)
+    ref_vars = np.var(ref_batch, axis=0)
+
+    # For each column in each target batch, find the mean and variance of that column
+    for target_batch in target_batches:
+        target_means = np.mean(target_batch, axis=0)
+        target_vars = np.var(target_batch, axis=0)
+
+        # For each column, calculate the scaling factor and offset to map the target batch to the reference batch
+        for i in range(target_batch.shape[1]):
+            target_batch[:, i] = (target_batch[:, i] - target_means[i]) * np.sqrt(ref_vars[i] / target_vars[i]) + ref_means[i]
+
+    return target_batches
+
+
+
+
+
 if __name__ == "__main__":
     # e2 = load_data("Plate 27902_N")
     # e4 = load_data("Plate 28528_N")
@@ -467,8 +488,6 @@ if __name__ == "__main__":
 
     # e6 = load_data("Plate 36841")
     
-
-    
     # d = dict()
     # d["Plate 28528_N"] = e4
     # d["Plate 39630_N"] = e7
@@ -481,9 +500,16 @@ if __name__ == "__main__":
 
 
     b1 = load_data("Panel1")
-    
     b2 = load_data("Panel2")
     b3 = load_data("Panel3")
+
+    # corrected_batches = cytofBatchAdjust(b1, [b2, b3])
+
+    # # Save .npy files for the corrected batches
+    # np.save("Panel2_var.npy", corrected_batches[0])
+    # np.save("Panel3_var.npy", corrected_batches[1])
+
+
     # b4 = load_data("Panel1_var")
 
     d = dict()
