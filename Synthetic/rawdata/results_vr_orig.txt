@@ -70,3 +70,5 @@ Average Cluster Distance for Panel 2: 0.004994395801179634
 Average Mahalanobis Shift for Panel 2: 0.6522382749027772
 Average Cluster Distance for Panel 1 Transformed: 0.005884308463892313
 Average Mahalanobis Shift for Panel 1 Transformed: 0.7020361280412576
+
+Trained on 7, tested on 10

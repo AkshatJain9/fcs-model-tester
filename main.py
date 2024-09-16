@@ -21,8 +21,8 @@ all_channels = scatter_channels + fluro_channels
 
 transform = fk.transforms.LogicleTransform('logicle', param_t=262144, param_w=0.5, param_m=4.5, param_a=0)
 
-dataset = "Synthetic"
-processing_type = "CytofBatchAdjust"
+dataset = "ENU"
+processing_type = "rawdata"
 
 if (platform.system() == "Windows"):
     somepath = ".\\" + dataset + "\\" + processing_type + "\\"
@@ -326,9 +326,9 @@ def compute_mahalanobis_shift(data1, data2, cluster_centers1, cluster_covs1, clu
         hist2 = hist2 / np.sum(hist2)
 
         # Show the histograms
-        # plt.plot(hist1)
-        # plt.plot(hist2)
-        # plt.show()
+        plt.plot(hist1)
+        plt.plot(hist2)
+        plt.show()
 
         # Compute the TVD between the two histograms
         tvd = np.sum(np.abs(hist1 - hist2))
@@ -350,63 +350,63 @@ def compute_all_metrics(reference_batch, target_batches):
         file.write("\n-------------------------\n")
 
         # Mean Summary for all batches
-        file.write("Mean Summaries:\n")
-        mean1 = print_mean_summary(reference_batch)
-        file.write("Mean Summary Reference Dataset:\n" + str(mean1) + "\n")
+        # file.write("Mean Summaries:\n")
+        # mean1 = print_mean_summary(reference_batch)
+        # file.write("Mean Summary Reference Dataset:\n" + str(mean1) + "\n")
 
-        for batch_name, target_batch in target_batches.items():
-            mean2 = print_mean_summary(target_batch)
-            file.write(f"Mean Summary {batch_name}:\n" + str(mean2) + "\n")
-        file.write("\n-------------------------\n")
+        # for batch_name, target_batch in target_batches.items():
+        #     mean2 = print_mean_summary(target_batch)
+        #     file.write(f"Mean Summary {batch_name}:\n" + str(mean2) + "\n")
+        # file.write("\n-------------------------\n")
 
-        # MSE Difference in Means for all batches
-        file.write("MSE Difference in Means:\n")
-        for batch_name, target_batch in target_batches.items():
-            mean2 = print_mean_summary(target_batch)
-            mean_diff = np.mean((mean1 - mean2)**2)
-            file.write(f"MSE Difference for {batch_name}: {mean_diff}\n")
-        file.write("\n-------------------------\n")
+        # # MSE Difference in Means for all batches
+        # file.write("MSE Difference in Means:\n")
+        # for batch_name, target_batch in target_batches.items():
+        #     mean2 = print_mean_summary(target_batch)
+        #     mean_diff = np.mean((mean1 - mean2)**2)
+        #     file.write(f"MSE Difference for {batch_name}: {mean_diff}\n")
+        # file.write("\n-------------------------\n")
 
-        # Std Summary for all batches
-        file.write("Std Summaries:\n")
-        std1 = print_std_summary(reference_batch)
-        file.write("Std Summary Reference Dataset:\n" + str(std1) + "\n")
+        # # Std Summary for all batches
+        # file.write("Std Summaries:\n")
+        # std1 = print_std_summary(reference_batch)
+        # file.write("Std Summary Reference Dataset:\n" + str(std1) + "\n")
 
-        for batch_name, target_batch in target_batches.items():
-            std2 = print_std_summary(target_batch)
-            file.write(f"Std Summary {batch_name}:\n" + str(std2) + "\n")
-        file.write("\n-------------------------\n")
+        # for batch_name, target_batch in target_batches.items():
+        #     std2 = print_std_summary(target_batch)
+        #     file.write(f"Std Summary {batch_name}:\n" + str(std2) + "\n")
+        # file.write("\n-------------------------\n")
 
-        # MSE Difference in Std for all batches
-        file.write("MSE Difference in Standard Deviations:\n")
-        for batch_name, target_batch in target_batches.items():
-            std2 = print_std_summary(target_batch)
-            std_diff = np.mean((std1 - std2)**2)
-            file.write(f"MSE Difference for {batch_name}: {std_diff}\n")
-        file.write("\n-------------------------\n")
+        # # MSE Difference in Std for all batches
+        # file.write("MSE Difference in Standard Deviations:\n")
+        # for batch_name, target_batch in target_batches.items():
+        #     std2 = print_std_summary(target_batch)
+        #     std_diff = np.mean((std1 - std2)**2)
+        #     file.write(f"MSE Difference for {batch_name}: {std_diff}\n")
+        # file.write("\n-------------------------\n")
 
-        # 1D TVD for all batches
-        file.write("1D TVD for each feature:\n")
-        for batch_name, target_batch in target_batches.items():
-            tvds = compute_all_tvd(reference_batch, target_batch)
-            file.write(f"1D TVD for {batch_name}:\n" + str(tvds) + "\n")
-            file.write(f"Mean 1D TVD for {batch_name}:\n" + str(np.mean(tvds)) + "\n")
-        file.write("\n-------------------------\n")
+        # # 1D TVD for all batches
+        # file.write("1D TVD for each feature:\n")
+        # for batch_name, target_batch in target_batches.items():
+        #     tvds = compute_all_tvd(reference_batch, target_batch)
+        #     file.write(f"1D TVD for {batch_name}:\n" + str(tvds) + "\n")
+        #     file.write(f"Mean 1D TVD for {batch_name}:\n" + str(np.mean(tvds)) + "\n")
+        # file.write("\n-------------------------\n")
 
-        # 2D TVD for all batches
-        file.write("2D TVD for each feature pair:\n")
-        for batch_name, target_batch in target_batches.items():
-            tvds_fluoro = compute_all_tvd_2d(reference_batch, target_batch)
-            file.write(f"2D TVD for {batch_name}:\n" + str(tvds_fluoro) + "\n")
-            file.write(f"Mean 2D TVD for {batch_name}:\n" + str(np.mean(tvds_fluoro)) + "\n")
-        file.write("\n-------------------------\n")
+        # # 2D TVD for all batches
+        # file.write("2D TVD for each feature pair:\n")
+        # for batch_name, target_batch in target_batches.items():
+        #     tvds_fluoro = compute_all_tvd_2d(reference_batch, target_batch)
+        #     file.write(f"2D TVD for {batch_name}:\n" + str(tvds_fluoro) + "\n")
+        #     file.write(f"Mean 2D TVD for {batch_name}:\n" + str(np.mean(tvds_fluoro)) + "\n")
+        # file.write("\n-------------------------\n")
 
         # Cluster Distance for all batches
         file.write("Average Cluster Distance:\n")
-        cluster_centers1, cluster_cov1, batch_labels1 = get_main_cell_pops(reference_batch[:, 6:], 13)
+        cluster_centers1, cluster_cov1, batch_labels1 = get_main_cell_pops(reference_batch[:, 6:], 4)
 
         for batch_name, target_batch in target_batches.items():
-            cluster_centers2, cluster_cov2, batch_labels2 = get_main_cell_pops(target_batch[:, 6:], 13)
+            cluster_centers2, cluster_cov2, batch_labels2 = get_main_cell_pops(target_batch[:, 6:], 4)
             cluster_dist, correspondence_arr = average_cluster_distance(cluster_centers1, cluster_centers2)
             mahalaonbis_shift = compute_mahalanobis_shift(reference_batch[:, 6:], target_batch[:, 6:], cluster_centers1, cluster_cov1, cluster_centers2, cluster_cov2, batch_labels1, batch_labels2, correspondence_arr)
             file.write(f"Average Cluster Distance for {batch_name}: {cluster_dist}\n")
@@ -476,17 +476,27 @@ def cytofBatchAdjust(ref_batch, target_batches):
 
 
 if __name__ == "__main__":
-    # e2 = load_data("Plate 27902_N")
-    # e4 = load_data("Plate 28528_N")
-    # e7 = load_data("Plate 39630_N")
+    e2 = load_data("Plate_27902_N")
+    e4 = load_data("Plate_28528_N")
+    e7 = load_data("Plate_39630_N")
 
-    # e3 = load_data("Plate 28332")
-    # e5 = load_data("Plate 29178_N")
+    e3 = load_data("Plate_28332")
+    e5 = load_data("Plate_29178_N")
 
 
-    # e1 = load_data("Plate 19635 _CD8")
+    e1 = load_data("Plate_19635_CD8")
 
-    # e6 = load_data("Plate 36841")
+    e6 = load_data("Plate_36841")
+
+    res = cytofBatchAdjust(e1, [e4, e7, e3, e5, e2, e6])
+
+    # Save .npy files for the corrected batches
+    np.save("Plate_28528_N.npy", res[0])
+    np.save("Plate_39630_N.npy", res[1])
+    np.save("Plate_28332.npy", res[2])
+    np.save("Plate_29178_N.npy", res[3])
+    np.save("Plate_27902_N.npy", res[4])
+    np.save("Plate_36841.npy", res[5])
     
     # d = dict()
     # d["Plate 28528_N"] = e4
@@ -499,9 +509,9 @@ if __name__ == "__main__":
     # compute_all_metrics(e2, d)
 
 
-    b1 = load_data("Panel1")
-    b2 = load_data("Panel2")
-    b3 = load_data("Panel3")
+    # b1 = load_data("Panel1")
+    # b2 = load_data("Panel2")
+    # b3 = load_data("Panel1_sinkhorn_vr_clust13")
 
     # corrected_batches = cytofBatchAdjust(b1, [b2, b3])
 
@@ -512,11 +522,11 @@ if __name__ == "__main__":
 
     # b4 = load_data("Panel1_var")
 
-    d = dict()
-    d["Panel 2"] = b2
-    d["Panel 3"] = b3
+    # d = dict()
+    # d["Panel 2"] = b2
+    # d["Panel 1 Transformed"] = b3
 
-    compute_all_metrics(b1, d)
+    # compute_all_metrics(b1, d)
     # plot_all_histograms(b1, b3)
     # plot_all_histograms(b1, b4)
     # data_1 = b3[:, 6]
