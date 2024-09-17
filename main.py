@@ -21,7 +21,7 @@ all_channels = scatter_channels + fluro_channels
 
 transform = fk.transforms.LogicleTransform('logicle', param_t=262144, param_w=0.5, param_m=4.5, param_a=0)
 
-dataset = "ENU"
+dataset = "Synthetic"
 processing_type = "rawdata"
 
 if (platform.system() == "Windows"):
@@ -239,7 +239,7 @@ def average_cluster_distance(cluster_centers1, cluster_centers2):
 
 
 
-def compute_mahalanobis_values(data, cluster_centers, cluster_covs, batch_labels):
+def compute_mahalanobis_values(data, cluster_centers, batch_labels):
     """
     Compute the Mahalanobis distance between each point in the batch and the cluster center it is assigned to.
     
@@ -254,30 +254,10 @@ def compute_mahalanobis_values(data, cluster_centers, cluster_covs, batch_labels
         - mahalanobis_distances: 1D tensor of Mahalanobis distances for each sample
         - histograms: 2D tensor of histograms for each cluster
     """
-    # # Compute the Mahalanobis distance for each point to its assigned cluster center
-    # assigned_centers = cluster_centers[batch_labels]
-    # assigned_covs = cluster_covs[batch_labels]
-    # diff = data - assigned_centers
-    # inv_cov = np.linalg.inv(assigned_covs)
-    # mahalanobis_distances = np.einsum('bi,bij,bj->b', diff, inv_cov, diff)
-    
-    # # Compute histograms for each cluster
-    # values = []
-    # for label in range(cluster_centers.shape[0]):
-    #     cluster_samples = mahalanobis_distances[batch_labels == label]
-    #     values.append(cluster_samples)
-    
-    # return values
 
     # Compute MSE between each point and its assigned cluster center
     assigned_centers = cluster_centers[batch_labels]
     mse = np.mean((data - assigned_centers)**2, axis=1)
-
-    # assigned_covs = cluster_covs[batch_labels]
-    # diff = data - assigned_centers
-    # # return np.mean(diff ** 2, axis=1)
-    # inv_cov = np.linalg.inv(assigned_covs)
-    # mahalanobis_distances = np.einsum('bi,bij,bj->b', diff, inv_cov, diff)
     
     # Compute histograms for each cluster
     values = []
@@ -307,8 +287,8 @@ def compute_mahalanobis_shift(data1, data2, cluster_centers1, cluster_covs1, clu
     float: The Mahalanobis distance shift between the two batches
     """
     # Compute the Mahalanobis distances for each batch
-    values1 = compute_mahalanobis_values(data1, cluster_centers1, cluster_covs1, batch_labels1)
-    values2 = compute_mahalanobis_values(data2, cluster_centers2, cluster_covs2, batch_labels2)
+    values1 = compute_mahalanobis_values(data1, cluster_centers1, batch_labels1)
+    values2 = compute_mahalanobis_values(data2, cluster_centers2, batch_labels2)
     
     # Compute the Mahalanobis distance shift
     shifts = []
@@ -403,10 +383,10 @@ def compute_all_metrics(reference_batch, target_batches):
 
         # Cluster Distance for all batches
         file.write("Average Cluster Distance:\n")
-        cluster_centers1, cluster_cov1, batch_labels1 = get_main_cell_pops(reference_batch[:, 6:], 4)
+        cluster_centers1, cluster_cov1, batch_labels1 = get_main_cell_pops(reference_batch[:, 6:], 13)
 
         for batch_name, target_batch in target_batches.items():
-            cluster_centers2, cluster_cov2, batch_labels2 = get_main_cell_pops(target_batch[:, 6:], 4)
+            cluster_centers2, cluster_cov2, batch_labels2 = get_main_cell_pops(target_batch[:, 6:], 13)
             cluster_dist, correspondence_arr = average_cluster_distance(cluster_centers1, cluster_centers2)
             mahalaonbis_shift = compute_mahalanobis_shift(reference_batch[:, 6:], target_batch[:, 6:], cluster_centers1, cluster_cov1, cluster_centers2, cluster_cov2, batch_labels1, batch_labels2, correspondence_arr)
             file.write(f"Average Cluster Distance for {batch_name}: {cluster_dist}\n")
@@ -476,27 +456,27 @@ def cytofBatchAdjust(ref_batch, target_batches):
 
 
 if __name__ == "__main__":
-    e2 = load_data("Plate_27902_N")
-    e4 = load_data("Plate_28528_N")
-    e7 = load_data("Plate_39630_N")
+    # e2 = load_data("Plate_27902_N")
+    # e4 = load_data("Plate_28528_N")
+    # e7 = load_data("Plate_39630_N")
 
-    e3 = load_data("Plate_28332")
-    e5 = load_data("Plate_29178_N")
+    # e3 = load_data("Plate_28332")
+    # e5 = load_data("Plate_29178_N")
 
 
-    e1 = load_data("Plate_19635_CD8")
+    # e1 = load_data("Plate_19635_CD8")
 
-    e6 = load_data("Plate_36841")
+    # e6 = load_data("Plate_36841")
 
-    res = cytofBatchAdjust(e1, [e4, e7, e3, e5, e2, e6])
+    # res = cytofBatchAdjust(e1, [e4, e7, e3, e5, e2, e6])
 
-    # Save .npy files for the corrected batches
-    np.save("Plate_28528_N.npy", res[0])
-    np.save("Plate_39630_N.npy", res[1])
-    np.save("Plate_28332.npy", res[2])
-    np.save("Plate_29178_N.npy", res[3])
-    np.save("Plate_27902_N.npy", res[4])
-    np.save("Plate_36841.npy", res[5])
+    # # Save .npy files for the corrected batches
+    # np.save("Plate_28528_N.npy", res[0])
+    # np.save("Plate_39630_N.npy", res[1])
+    # np.save("Plate_28332.npy", res[2])
+    # np.save("Plate_29178_N.npy", res[3])
+    # np.save("Plate_27902_N.npy", res[4])
+    # np.save("Plate_36841.npy", res[5])
     
     # d = dict()
     # d["Plate 28528_N"] = e4
@@ -509,29 +489,12 @@ if __name__ == "__main__":
     # compute_all_metrics(e2, d)
 
 
-    # b1 = load_data("Panel1")
-    # b2 = load_data("Panel2")
-    # b3 = load_data("Panel1_sinkhorn_vr_clust13")
+    b1 = load_data("Panel1")
+    b2 = load_data("Panel2")
+    b3 = load_data("Panel1_vr_clust_end8k")
 
-    # corrected_batches = cytofBatchAdjust(b1, [b2, b3])
+    d = dict()
+    d["Panel 2"] = b2
+    d["Panel 1 Transformed"] = b3
 
-    # # Save .npy files for the corrected batches
-    # np.save("Panel2_var.npy", corrected_batches[0])
-    # np.save("Panel3_var.npy", corrected_batches[1])
-
-
-    # b4 = load_data("Panel1_var")
-
-    # d = dict()
-    # d["Panel 2"] = b2
-    # d["Panel 1 Transformed"] = b3
-
-    # compute_all_metrics(b1, d)
-    # plot_all_histograms(b1, b3)
-    # plot_all_histograms(b1, b4)
-    # data_1 = b3[:, 6]
-    # data_2 = b3[:, 7]
-
-    # # plot a scatter plot
-    # plt.scatter(data_1, data_2)
-    # plt.show()
+    compute_all_metrics(b1, d)
