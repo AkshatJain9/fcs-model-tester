@@ -238,85 +238,6 @@ def average_cluster_distance(cluster_centers1, cluster_centers2):
     return mean_mse, correspondence_array
 
 
-
-def compute_mahalanobis_values(data, cluster_centers, batch_labels):
-    """
-    Compute the Mahalanobis distance between each point in the batch and the cluster center it is assigned to.
-    
-    Args:
-    data (torch.Tensor): 2D tensor of shape (n_samples, n_features)
-    cluster_centers (torch.Tensor): 2D tensor of shape (n_clusters, n_features)
-    cluster_covs (torch.Tensor): 3D tensor of shape (n_clusters, n_features, n_features)
-    batch_labels (torch.Tensor): 1D tensor of cluster assignments for each sample
-    
-    Returns:
-    tuple: (mahalanobis_distances, histograms)
-        - mahalanobis_distances: 1D tensor of Mahalanobis distances for each sample
-        - histograms: 2D tensor of histograms for each cluster
-    """
-
-    # Compute MSE between each point and its assigned cluster center
-    assigned_centers = cluster_centers[batch_labels]
-    mse = np.mean((data - assigned_centers)**2, axis=1)
-    
-    # Compute histograms for each cluster
-    values = []
-    for label in range(cluster_centers.shape[0]):
-        cluster_samples = mse[batch_labels == label]
-        values.append(cluster_samples)
-
-    return values
-
-
-def compute_mahalanobis_shift(data1, data2, cluster_centers1, cluster_covs1, cluster_centers2, cluster_covs2, batch_labels1, batch_labels2, correspondence_arr):
-    """
-    Compute the Mahalanobis distance shift between two batches of data.
-    
-    Args:
-    data1 (torch.Tensor): 2D tensor of shape (n_samples1, n_features)
-    data2 (torch.Tensor): 2D tensor of shape (n_samples2, n_features)
-    cluster_centers1 (torch.Tensor): 2D tensor of shape (n_clusters, n_features)
-    cluster_covs1 (torch.Tensor): 3D tensor of shape (n_clusters, n_features, n_features)
-    cluster_centers2 (torch.Tensor): 2D tensor of shape (n_clusters, n_features)
-    cluster_covs2 (torch.Tensor): 3D tensor of shape (n_clusters, n_features, n_features)
-    batch_labels1 (torch.Tensor): 1D tensor of cluster assignments for each sample in data1
-    batch_labels2 (torch.Tensor): 1D tensor of cluster assignments for each sample in data2
-    correspondence_arr (list): List of pairs of indices corresponding to the cluster correspondence
-    
-    Returns:
-    float: The Mahalanobis distance shift between the two batches
-    """
-    # Compute the Mahalanobis distances for each batch
-    values1 = compute_mahalanobis_values(data1, cluster_centers1, batch_labels1)
-    values2 = compute_mahalanobis_values(data2, cluster_centers2, batch_labels2)
-    
-    # Compute the Mahalanobis distance shift
-    shifts = []
-    for i, j in correspondence_arr:
-        data1_values = values1[i]
-        data2_values = values2[j]
-
-        max_val = max(np.max(data1_values), np.max(data2_values))
-
-        # Make a histogram out of these values with 50 bins
-        hist1, _ = np.histogram(data1_values, bins=50, range=(0, max_val))
-        hist2, _ = np.histogram(data2_values, bins=50, range=(0, max_val))
-
-        hist1 = hist1 / np.sum(hist1)
-        hist2 = hist2 / np.sum(hist2)
-
-        # Show the histograms
-        plt.plot(hist1)
-        plt.plot(hist2)
-        plt.show()
-
-        # Compute the TVD between the two histograms
-        tvd = np.sum(np.abs(hist1 - hist2))
-        shifts.append(tvd)
-    
-    return np.mean(shifts)
-
-
 ###################### FINAL FUNCTION ######################
 def compute_all_metrics(reference_batch, target_batches):
     file_name = somepath + "results.txt"
@@ -330,67 +251,65 @@ def compute_all_metrics(reference_batch, target_batches):
         file.write("\n-------------------------\n")
 
         # Mean Summary for all batches
-        # file.write("Mean Summaries:\n")
-        # mean1 = print_mean_summary(reference_batch)
-        # file.write("Mean Summary Reference Dataset:\n" + str(mean1) + "\n")
+        file.write("Mean Summaries:\n")
+        mean1 = print_mean_summary(reference_batch)
+        file.write("Mean Summary Reference Dataset:\n" + str(mean1) + "\n")
 
-        # for batch_name, target_batch in target_batches.items():
-        #     mean2 = print_mean_summary(target_batch)
-        #     file.write(f"Mean Summary {batch_name}:\n" + str(mean2) + "\n")
-        # file.write("\n-------------------------\n")
+        for batch_name, target_batch in target_batches.items():
+            mean2 = print_mean_summary(target_batch)
+            file.write(f"Mean Summary {batch_name}:\n" + str(mean2) + "\n")
+        file.write("\n-------------------------\n")
 
-        # # MSE Difference in Means for all batches
-        # file.write("MSE Difference in Means:\n")
-        # for batch_name, target_batch in target_batches.items():
-        #     mean2 = print_mean_summary(target_batch)
-        #     mean_diff = np.mean((mean1 - mean2)**2)
-        #     file.write(f"MSE Difference for {batch_name}: {mean_diff}\n")
-        # file.write("\n-------------------------\n")
+        # MSE Difference in Means for all batches
+        file.write("MSE Difference in Means:\n")
+        for batch_name, target_batch in target_batches.items():
+            mean2 = print_mean_summary(target_batch)
+            mean_diff = np.mean((mean1 - mean2)**2)
+            file.write(f"MSE Difference for {batch_name}: {mean_diff}\n")
+        file.write("\n-------------------------\n")
 
-        # # Std Summary for all batches
-        # file.write("Std Summaries:\n")
-        # std1 = print_std_summary(reference_batch)
-        # file.write("Std Summary Reference Dataset:\n" + str(std1) + "\n")
+        # Std Summary for all batches
+        file.write("Std Summaries:\n")
+        std1 = print_std_summary(reference_batch)
+        file.write("Std Summary Reference Dataset:\n" + str(std1) + "\n")
 
-        # for batch_name, target_batch in target_batches.items():
-        #     std2 = print_std_summary(target_batch)
-        #     file.write(f"Std Summary {batch_name}:\n" + str(std2) + "\n")
-        # file.write("\n-------------------------\n")
+        for batch_name, target_batch in target_batches.items():
+            std2 = print_std_summary(target_batch)
+            file.write(f"Std Summary {batch_name}:\n" + str(std2) + "\n")
+        file.write("\n-------------------------\n")
 
-        # # MSE Difference in Std for all batches
-        # file.write("MSE Difference in Standard Deviations:\n")
-        # for batch_name, target_batch in target_batches.items():
-        #     std2 = print_std_summary(target_batch)
-        #     std_diff = np.mean((std1 - std2)**2)
-        #     file.write(f"MSE Difference for {batch_name}: {std_diff}\n")
-        # file.write("\n-------------------------\n")
+        # MSE Difference in Std for all batches
+        file.write("MSE Difference in Standard Deviations:\n")
+        for batch_name, target_batch in target_batches.items():
+            std2 = print_std_summary(target_batch)
+            std_diff = np.mean((std1 - std2)**2)
+            file.write(f"MSE Difference for {batch_name}: {std_diff}\n")
+        file.write("\n-------------------------\n")
 
-        # # 1D TVD for all batches
-        # file.write("1D TVD for each feature:\n")
-        # for batch_name, target_batch in target_batches.items():
-        #     tvds = compute_all_tvd(reference_batch, target_batch)
-        #     file.write(f"1D TVD for {batch_name}:\n" + str(tvds) + "\n")
-        #     file.write(f"Mean 1D TVD for {batch_name}:\n" + str(np.mean(tvds)) + "\n")
-        # file.write("\n-------------------------\n")
+        # 1D TVD for all batches
+        file.write("1D TVD for each feature:\n")
+        for batch_name, target_batch in target_batches.items():
+            tvds = compute_all_tvd(reference_batch, target_batch)
+            file.write(f"1D TVD for {batch_name}:\n" + str(tvds) + "\n")
+            file.write(f"Mean 1D TVD for {batch_name}:\n" + str(np.mean(tvds)) + "\n")
+        file.write("\n-------------------------\n")
 
-        # # 2D TVD for all batches
-        # file.write("2D TVD for each feature pair:\n")
-        # for batch_name, target_batch in target_batches.items():
-        #     tvds_fluoro = compute_all_tvd_2d(reference_batch, target_batch)
-        #     file.write(f"2D TVD for {batch_name}:\n" + str(tvds_fluoro) + "\n")
-        #     file.write(f"Mean 2D TVD for {batch_name}:\n" + str(np.mean(tvds_fluoro)) + "\n")
-        # file.write("\n-------------------------\n")
+        # 2D TVD for all batches
+        file.write("2D TVD for each feature pair:\n")
+        for batch_name, target_batch in target_batches.items():
+            tvds_fluoro = compute_all_tvd_2d(reference_batch, target_batch)
+            file.write(f"2D TVD for {batch_name}:\n" + str(tvds_fluoro) + "\n")
+            file.write(f"Mean 2D TVD for {batch_name}:\n" + str(np.mean(tvds_fluoro)) + "\n")
+        file.write("\n-------------------------\n")
 
         # Cluster Distance for all batches
         file.write("Average Cluster Distance:\n")
-        cluster_centers1, cluster_cov1, batch_labels1 = get_main_cell_pops(reference_batch[:, 6:], 13)
+        cluster_centers1, cluster_cov1, batch_labels1 = get_main_cell_pops(reference_batch[:, 6:], 6)
 
         for batch_name, target_batch in target_batches.items():
-            cluster_centers2, cluster_cov2, batch_labels2 = get_main_cell_pops(target_batch[:, 6:], 13)
+            cluster_centers2, cluster_cov2, batch_labels2 = get_main_cell_pops(target_batch[:, 6:], 6)
             cluster_dist, correspondence_arr = average_cluster_distance(cluster_centers1, cluster_centers2)
-            mahalaonbis_shift = compute_mahalanobis_shift(reference_batch[:, 6:], target_batch[:, 6:], cluster_centers1, cluster_cov1, cluster_centers2, cluster_cov2, batch_labels1, batch_labels2, correspondence_arr)
             file.write(f"Average Cluster Distance for {batch_name}: {cluster_dist}\n")
-            file.write(f"Average Mahalanobis Shift for {batch_name}: {mahalaonbis_shift}\n")
 
     print(f"Metrics summary saved to {file_name}")
 
@@ -489,12 +408,17 @@ if __name__ == "__main__":
     # compute_all_metrics(e2, d)
 
 
-    b1 = load_data("Panel1")
-    b2 = load_data("Panel2")
-    b3 = load_data("Panel1_vr_clust_end8k")
+    # b1 = load_data("Panel1")
+    # b2 = load_data("Panel2")
+    # b3 = load_data("Panel1_mse_sink_clust6_reg_oc24")
 
-    d = dict()
-    d["Panel 2"] = b2
-    d["Panel 1 Transformed"] = b3
+    # plot_all_histograms(b1, b3)
 
-    compute_all_metrics(b1, d)
+    # d = dict()
+    # d["Panel 2"] = b2
+    # d["Panel 1 Transformed"] = b3
+
+    # compute_all_metrics(b1, d)
+    latent = load_data("latent copy")
+
+    plot_all_histograms(latent, latent)
