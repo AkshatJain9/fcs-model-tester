@@ -59,7 +59,7 @@ def load_data(panel: str, load_orig: bool = False) -> np.ndarray:
         else:
             sample.apply_compensation(sample.metadata['spill'])
         sample.apply_transform(transform)
-        fcs_files_np.append(get_np_array_from_sample(sample, subsample=True))
+        fcs_files_np.append(get_np_array_from_sample(sample, subsample=(not load_orig)))
 
     stacked_np = np.vstack(fcs_files_np)
     np.save(panel_root + panel + ".npy", stacked_np)
@@ -206,7 +206,7 @@ def plot_all_histograms(panel_np_1, panel_np_2):
 ############# CELL POPULATIONS ################
 def get_main_cell_pops(data, k):
     gmm = GaussianMixture(n_components=k, random_state=0).fit(data)
-    return gmm.means_, gmm.covariances_, gmm.predict(data)
+    return gmm.means_
 
 # Function to compute the average distance between two sets of cluster centers
 def average_cluster_distance(cluster_centers1, cluster_centers2):
@@ -304,10 +304,10 @@ def compute_all_metrics(reference_batch, target_batches):
 
         # Cluster Distance for all batches
         file.write("Average Cluster Distance:\n")
-        cluster_centers1, cluster_cov1, batch_labels1 = get_main_cell_pops(reference_batch[:, 6:], 6)
+        cluster_centers1 = get_main_cell_pops(reference_batch[:, 6:], 10)
 
         for batch_name, target_batch in target_batches.items():
-            cluster_centers2, cluster_cov2, batch_labels2 = get_main_cell_pops(target_batch[:, 6:], 6)
+            cluster_centers2 = get_main_cell_pops(target_batch[:, 6:], 10)
             cluster_dist, correspondence_arr = average_cluster_distance(cluster_centers1, cluster_centers2)
             file.write(f"Average Cluster Distance for {batch_name}: {cluster_dist}\n")
 
@@ -375,50 +375,43 @@ def cytofBatchAdjust(ref_batch, target_batches):
 
 
 if __name__ == "__main__":
-    # e2 = load_data("Plate_27902_N")
-    # e4 = load_data("Plate_28528_N")
-    # e7 = load_data("Plate_39630_N")
+    # e2 = load_data("Plate 27902_N")
+    # e4 = load_data("Plate 28528_N")
+    # e7 = load_data("Plate 39630_N")
 
-    # e3 = load_data("Plate_28332")
-    # e5 = load_data("Plate_29178_N")
+    # # e3 = load_data("Plate 28332")
+    # # e5 = load_data("Plate 29178_N")
 
 
-    # e1 = load_data("Plate_19635_CD8")
+    # # e1 = load_data("Plate 19635_CD8")
 
-    # e6 = load_data("Plate_36841")
+    # # e6 = load_data("Plate 36841")
 
-    # res = cytofBatchAdjust(e1, [e4, e7, e3, e5, e2, e6])
+    # e2_x = load_data("Plate 27902_N_x")
 
-    # # Save .npy files for the corrected batches
-    # np.save("Plate_28528_N.npy", res[0])
-    # np.save("Plate_39630_N.npy", res[1])
-    # np.save("Plate_28332.npy", res[2])
-    # np.save("Plate_29178_N.npy", res[3])
-    # np.save("Plate_27902_N.npy", res[4])
-    # np.save("Plate_36841.npy", res[5])
+    # # plot_all_histograms(e2, e2_x)
+
     
     # d = dict()
     # d["Plate 28528_N"] = e4
     # d["Plate 39630_N"] = e7
-    # d["Plate 28332"] = e3
-    # d["Plate 29178_N"] = e5
-    # d["Plate 19635 _CD8"] = e1
-    # d["Plate 36841"] = e6
+    # # d["Plate 28332"] = e3
+    # # d["Plate 29178_N"] = e5
+    # # d["Plate 19635 _CD8"] = e1
+    # # d["Plate 36841"] = e6
+    # d["Plate 27902_N_x"] = e2_x
 
     # compute_all_metrics(e2, d)
 
 
-    # b1 = load_data("Panel1")
-    # b2 = load_data("Panel2")
-    # b3 = load_data("Panel1_mse_sink_clust6_reg_oc24")
+    b1 = load_data("Panel1")
+    b2 = load_data("Panel2")
+    b3 = load_data("Panel3")
 
     # plot_all_histograms(b1, b3)
 
-    # d = dict()
-    # d["Panel 2"] = b2
-    # d["Panel 1 Transformed"] = b3
+    d = dict()
+    d["Panel 2"] = b2
+    d["Panel 3"] = b3
 
-    # compute_all_metrics(b1, d)
-    latent = load_data("latent copy")
-
-    plot_all_histograms(latent, latent)
+    compute_all_metrics(b1, d)
