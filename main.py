@@ -21,8 +21,8 @@ all_channels = scatter_channels + fluro_channels
 
 transform = fk.transforms.LogicleTransform('logicle', param_t=262144, param_w=0.5, param_m=4.5, param_a=0)
 
-dataset = "Synthetic"
-processing_type = "COMBAT_AE"
+dataset = "ENU"
+processing_type = "CytoRUV"
 
 if (platform.system() == "Windows"):
     somepath = ".\\" + dataset + "\\" + processing_type + "\\"
@@ -376,37 +376,37 @@ def cytofBatchAdjust(ref_batch, target_batches):
 
 
 if __name__ == "__main__":
-    # e2 = load_data("Plate 27902_N")
-    # e4 = load_data("Plate 28528_N")
-    # e7 = load_data("Plate 39630_N")
+    e2 = load_data("Plate 27902_N")
+    e4 = load_data("Plate 28528_N")
+    e7 = load_data("Plate 39630_N")
 
-    # e3 = load_data("Plate 28332")
-    # e5 = load_data("Plate 29178_N")
+    e3 = load_data("Plate 28332")
+    e5 = load_data("Plate 29178_N")
 
 
-    # e1 = load_data("Plate 19635_CD8")
+    e1 = load_data("Plate 19635_CD8")
 
-    # e6 = load_data("Plate 36841")
+    e6 = load_data("Plate 36841")
 
     
-    # d = dict()
-    # d["Plate 28528_N"] = e4
-    # d["Plate 39630_N"] = e7
-    # d["Plate 28332"] = e3
-    # d["Plate 29178_N"] = e5
-    # # d["Plate 19635 _CD8"] = e1
-    # d["Plate 27902_N"] = e2
-    # d["Plate 36841"] = e6
-
-    # compute_all_metrics(e1, d)
-
-
-    b1 = load_data("Panel1")
-    b2 = load_data("Panel2")
-    b3 = load_data("Panel3")
-
     d = dict()
-    d["Panel 2"] = b2
-    d["Panel 3"] = b3
+    d["Plate 28528_N"] = e4
+    d["Plate 39630_N"] = e7
+    d["Plate 28332"] = e3
+    d["Plate 29178_N"] = e5
+    # d["Plate 19635 _CD8"] = e1
+    d["Plate 27902_N"] = e2
+    d["Plate 36841"] = e6
 
-    compute_all_metrics(b1, d)
+    compute_all_metrics(e1, d)
+
+
+    # b1 = load_data("Panel1")
+    # b2 = load_data("Panel2")
+    # b3 = load_data("Panel3")
+
+    # d = dict()
+    # d["Panel 2"] = b2
+    # d["Panel 3"] = b3
+
+    # compute_all_metrics(b1, d)
