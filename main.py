@@ -22,7 +22,7 @@ all_channels = scatter_channels + fluro_channels
 transform = fk.transforms.LogicleTransform('logicle', param_t=262144, param_w=0.5, param_m=4.5, param_a=0)
 
 dataset = "ENU"
-processing_type = "AE_EmpBayes_CD8"
+processing_type = "AE_ClusAlign_27902"
 
 if (platform.system() == "Windows"):
     somepath = ".\\" + dataset + "\\" + processing_type + "\\"
@@ -394,11 +394,11 @@ if __name__ == "__main__":
     d["Plate 39630_N"] = e7
     d["Plate 28332"] = e3
     d["Plate 29178_N"] = e5
-    # d["Plate 19635 _CD8"] = e1
-    d["Plate 27902_N"] = e2
+    d["Plate 19635 _CD8"] = e1
+    # d["Plate 27902_N"] = e2
     d["Plate 36841"] = e6
 
-    compute_all_metrics(e1, d)
+    compute_all_metrics(e2, d)
 
 
     # b1 = load_data("Panel1")
