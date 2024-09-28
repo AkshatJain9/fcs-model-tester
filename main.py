@@ -22,7 +22,7 @@ all_channels = scatter_channels + fluro_channels
 transform = fk.transforms.LogicleTransform('logicle', param_t=262144, param_w=0.5, param_m=4.5, param_a=0)
 
 dataset = "ENU"
-processing_type = "AE_LL_CD8"
+processing_type = "AE_EmpBayes_CD8"
 
 if (platform.system() == "Windows"):
     somepath = ".\\" + dataset + "\\" + processing_type + "\\"
@@ -241,67 +241,67 @@ def average_cluster_distance(cluster_centers1, cluster_centers2):
 
 ###################### FINAL FUNCTION ######################
 def compute_all_metrics(reference_batch, target_batches):
-    file_name = somepath + "resultss.txt"
+    file_name = somepath + "results.txt"
 
     # Open the file for writing the summary
     with open(file_name, "w") as file:
         # Print header with batch names
-        # file.write("Batches:\n")
-        # for batch_name in target_batches.keys():
-        #     file.write(f"{batch_name}\n")
-        # file.write("\n-------------------------\n")
+        file.write("Batches:\n")
+        for batch_name in target_batches.keys():
+            file.write(f"{batch_name}\n")
+        file.write("\n-------------------------\n")
 
-        # # Mean Summary for all batches
-        # file.write("Mean Summaries:\n")
-        # mean1 = print_mean_summary(reference_batch)
-        # file.write("Mean Summary Reference Dataset:\n" + str(mean1) + "\n")
+        # Mean Summary for all batches
+        file.write("Mean Summaries:\n")
+        mean1 = print_mean_summary(reference_batch)
+        file.write("Mean Summary Reference Dataset:\n" + str(mean1) + "\n")
 
-        # for batch_name, target_batch in target_batches.items():
-        #     mean2 = print_mean_summary(target_batch)
-        #     file.write(f"Mean Summary {batch_name}:\n" + str(mean2) + "\n")
-        # file.write("\n-------------------------\n")
+        for batch_name, target_batch in target_batches.items():
+            mean2 = print_mean_summary(target_batch)
+            file.write(f"Mean Summary {batch_name}:\n" + str(mean2) + "\n")
+        file.write("\n-------------------------\n")
 
-        # # MSE Difference in Means for all batches
-        # file.write("MSE Difference in Means:\n")
-        # for batch_name, target_batch in target_batches.items():
-        #     mean2 = print_mean_summary(target_batch)
-        #     mean_diff = np.mean((mean1 - mean2)**2)
-        #     file.write(f"MSE Difference for {batch_name}: {mean_diff}\n")
-        # file.write("\n-------------------------\n")
+        # MSE Difference in Means for all batches
+        file.write("MSE Difference in Means:\n")
+        for batch_name, target_batch in target_batches.items():
+            mean2 = print_mean_summary(target_batch)
+            mean_diff = np.mean((mean1 - mean2)**2)
+            file.write(f"MSE Difference for {batch_name}: {mean_diff}\n")
+        file.write("\n-------------------------\n")
 
-        # # Std Summary for all batches
-        # file.write("Std Summaries:\n")
-        # std1 = print_std_summary(reference_batch)
-        # file.write("Std Summary Reference Dataset:\n" + str(std1) + "\n")
+        # Std Summary for all batches
+        file.write("Std Summaries:\n")
+        std1 = print_std_summary(reference_batch)
+        file.write("Std Summary Reference Dataset:\n" + str(std1) + "\n")
 
-        # for batch_name, target_batch in target_batches.items():
-        #     std2 = print_std_summary(target_batch)
-        #     file.write(f"Std Summary {batch_name}:\n" + str(std2) + "\n")
-        # file.write("\n-------------------------\n")
+        for batch_name, target_batch in target_batches.items():
+            std2 = print_std_summary(target_batch)
+            file.write(f"Std Summary {batch_name}:\n" + str(std2) + "\n")
+        file.write("\n-------------------------\n")
 
-        # # MSE Difference in Std for all batches
-        # file.write("MSE Difference in Standard Deviations:\n")
-        # for batch_name, target_batch in target_batches.items():
-        #     std2 = print_std_summary(target_batch)
-        #     std_diff = np.mean((std1 - std2)**2)
-        #     file.write(f"MSE Difference for {batch_name}: {std_diff}\n")
-        # file.write("\n-------------------------\n")
+        # MSE Difference in Std for all batches
+        file.write("MSE Difference in Standard Deviations:\n")
+        for batch_name, target_batch in target_batches.items():
+            std2 = print_std_summary(target_batch)
+            std_diff = np.mean((std1 - std2)**2)
+            file.write(f"MSE Difference for {batch_name}: {std_diff}\n")
+        file.write("\n-------------------------\n")
 
-        # # 1D TVD for all batches
-        # file.write("1D TVD for each feature:\n")
-        # for batch_name, target_batch in target_batches.items():
-        #     tvds = compute_all_tvd(reference_batch, target_batch)
-        #     file.write(f"1D TVD for {batch_name}:\n" + str(tvds) + "\n")
-        #     file.write(f"Mean 1D TVD for {batch_name}:\n" + str(np.mean(tvds)) + "\n")
-        # file.write("\n-------------------------\n")
+        # 1D TVD for all batches
+        file.write("1D TVD for each feature:\n")
+        for batch_name, target_batch in target_batches.items():
+            tvds = compute_all_tvd(reference_batch, target_batch)
+            file.write(f"1D TVD for {batch_name}:\n" + str(tvds) + "\n")
+            file.write(f"Mean 1D TVD for {batch_name}:\n" + str(np.mean(tvds)) + "\n")
+        file.write("\n-------------------------\n")
 
         # 2D TVD for all batches
-        # file.write("2D TVD for each feature pair:\n")
-        # for batch_name, target_batch in target_batches.items():
-        #     tvds_fluoro = compute_all_tvd_2d(reference_batch, target_batch)
-        #     file.write(f"2D TVD for {batch_name}:\n" + str(tvds_fluoro) + "\n")
-        #     file.write(f"Mean 2D TVD for {batch_name}:\n" + str(np.mean(tvds_fluoro)) + "\n")
-        # file.write("\n-------------------------\n")
+        file.write("2D TVD for each feature pair:\n")
+        for batch_name, target_batch in target_batches.items():
+            tvds_fluoro = compute_all_tvd_2d(reference_batch, target_batch)
+            file.write(f"2D TVD for {batch_name}:\n" + str(tvds_fluoro) + "\n")
+            file.write(f"Mean 2D TVD for {batch_name}:\n" + str(np.mean(tvds_fluoro)) + "\n")
+        file.write("\n-------------------------\n")
 
         # Cluster Distance for all batches
         file.write("Average Cluster Distance:\n")
