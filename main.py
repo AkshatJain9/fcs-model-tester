@@ -314,7 +314,6 @@ def compute_all_metrics(reference_batch, target_batches):
 
     print(f"Metrics summary saved to {file_name}")
 
-
 ########## K MEANS CLUSTERING ############
 def find_optimal_k(data, max_k):
     """
