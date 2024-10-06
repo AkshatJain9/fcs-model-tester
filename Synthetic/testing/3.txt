@@ -3,4 +3,4 @@ Panel 1 Sink
 
 -------------------------
 Average Cluster Distance:
-Average Cluster Distance for Panel 1 Sink: 0.011121748129889496
+Average Cluster Distance for Panel 1 Sink: 0.004738403119388342
