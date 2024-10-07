@@ -1,0 +1,68 @@
+\begin{table}[htbp]\centering\begin{tabular}{|l|c|c|}
+\hline Channel & Panel 2 & Panel 3 \\\hline
+FSC-A & 2.01e-07 & 8.40e-08 \\
+FSC-H & 6.61e-07 & 7.69e-10 \\
+FSC-W & 1.12e-07 & 3.24e-07 \\
+SSC-A & 5.18e-09 & 3.39e-07 \\
+SSC-H & 1.54e-07 & 6.25e-07 \\
+SSC-W & 3.94e-07 & 3.89e-07 \\
+CD8 & 0.00033566 & 0.00014081 \\
+B220 & 0.00034634 & 0.00172910 \\
+CD44 & 6.77e-05 & 6.17e-05 \\
+CD3 & 2.37e-05 & 2.25e-05 \\
+IgD & 6.94e-07 & 0.00030864 \\
+CD25 & 4.49e-07 & 2.59e-08 \\
+Ly6C & 0.00022815 & 0.00022984 \\
+NK1.1 & 4.35e-07 & 1.30e-05 \\
+IgM / CD4 & 0.00032202 & 0.00043148 \\
+LD & 1.26e-10 & 4.92e-07 \\
+CD19 & 5.09e-05 & 2.78e-05 \\
+CD62L & 7.45e-06 & 6.65e-08 \\
+\hline\hline Mean MSE Difference & 7.69e-05 & 0.00016485 \\
+\hline\end{tabular}\caption{MSE Differences for Scatter and Fluoro Channels across Batches}\label{tab:mse_differences}\end{table}
+\begin{table}[htbp]\centering\begin{tabular}{|l|c|c|}
+\hline Channel & Panel 2 & Panel 3 \\\hline
+FSC-A & 4.67e-07 & 2.03e-05 \\
+FSC-H & 2.07e-07 & 3.11e-06 \\
+FSC-W & 3.15e-06 & 1.73e-06 \\
+SSC-A & 2.26e-06 & 4.90e-06 \\
+SSC-H & 1.95e-07 & 2.28e-08 \\
+SSC-W & 6.89e-06 & 5.16e-06 \\
+CD8 & 0.00071870 & 0.00069314 \\
+B220 & 0.00011099 & 0.00071071 \\
+CD44 & 3.12e-05 & 7.81e-05 \\
+CD3 & 9.43e-08 & 1.57e-08 \\
+IgD & 3.41e-06 & 0.00041014 \\
+CD25 & 1.18e-06 & 1.03e-06 \\
+Ly6C & 9.92e-05 & 0.00015353 \\
+NK1.1 & 2.52e-05 & 0.00023300 \\
+IgM / CD4 & 0.00014731 & 0.00046293 \\
+LD & 4.83e-06 & 1.65e-05 \\
+CD19 & 0.00021899 & 0.00033180 \\
+CD62L & 2.89e-06 & 3.07e-06 \\
+\hline\hline Mean MSE Difference & 7.65e-05 & 0.00017384 \\\hline\end{tabular}\caption{MSE Differences for Scatter and Fluoro Channels Standard Deviations across Batches}\label{tab:mse_differences_stds}\end{table}
+\begin{table}[htbp]\centering\begin{tabular}{|l|c|c|}
+\hline Channel & Panel 2 & Panel 3 \\\hline
+FSC-A & 0.01549247 & 0.02576178 \\
+FSC-H & 0.03169660 & 0.02862082 \\
+FSC-W & 0.05166197 & 0.05984693 \\
+SSC-A & 0.02536436 & 0.05256019 \\
+SSC-H & 0.02142276 & 0.04495320 \\
+SSC-W & 0.06691369 & 0.10520497 \\
+CD8 & 0.27388722 & 0.27846954 \\
+B220 & 0.30538569 & 0.53356169 \\
+CD44 & 0.12104128 & 0.12847012 \\
+CD3 & 0.07595291 & 0.10603066 \\
+IgD & 0.02871819 & 0.22638189 \\
+CD25 & 0.02229392 & 0.02089384 \\
+Ly6C & 0.12121338 & 0.13252535 \\
+NK1.1 & 0.04650589 & 0.14851942 \\
+IgM / CD4 & 0.07329166 & 0.11975140 \\
+LD & 0.04671759 & 0.07943023 \\
+CD19 & 0.28726872 & 0.31350739 \\
+CD62L & 0.02885146 & 0.02919655 \\
+\hline\hline Mean 1D TVD & 0.09131554 & 0.13520478 \\\hline\end{tabular}\caption{1D TVD for Scatter and Fluoro Channels across Batches}\label{tab:1d_tvd}\end{table}
+\begin{table}[htbp]\centering\begin{tabular}{|l|c|c|}
+\hline Cluster MSE & Panel 2 & Panel 3 \\\hline
+Cluster MSE & 0.00400084 & 0.00399349 \\
+\hline\end{tabular}\caption{Average Cluster MSE Differences across Batches}\label{tab:cluster_mse}\end{table}
