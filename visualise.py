@@ -1,5 +1,7 @@
 import re
 import numpy as np
+import matplotlib.pyplot as plt  # Import matplotlib for plotting
+
 
 scatter_channels = ['FSC-A', 'FSC-H', 'FSC-W', 'SSC-A', 'SSC-H', 'SSC-W']
 fluro_channels_panel = ['CD8', 'B220', 'CD44', 'CD3', 'IgD', 'CD25', 'Ly6C', 'NK1.1', 'IgM / CD4', 'LD', 'CD19', 'CD62L']
@@ -112,103 +114,90 @@ def parse_results(file_content):
     return parsed_data
 
 
-def write_latex_mse_table(results, filename):
+
+# New function to write mean and std tables side by side
+def write_latex_mean_std_tables_side_by_side(results, filename):
     batches = results['batches']
     mean_summaries = results['mean_summaries']
-    mse_differences = [(mean_summaries[batch] - mean_summaries['Reference Dataset']) ** 2 for batch in batches]
-
+    std_summaries = results['std_summaries']
     mse_difference_means = results['mse_difference_means']
+    mse_difference_stds = results['mse_difference_stds']
 
-    def format_mse_value(mse_value):
-        """Formats MSE value in scientific notation if it's below 10^-5, otherwise keeps it in float format."""
-        if abs(mse_value) < 1e-4:
-            return f"{mse_value:.2e}"
+    mse_differences_means = [(mean_summaries[batch] - mean_summaries['Reference Dataset']) ** 2 for batch in batches]
+    mse_differences_stds = [(std_summaries[batch] - std_summaries['Reference Dataset']) ** 2 for batch in batches]
+
+    def format_value(value):
+        """Formats value in scientific notation if it's below 10^-5, otherwise keeps it in float format."""
+        if abs(value) < 1e-3:
+            return f"{value:.2e}"
         else:
-            return f"{mse_value:.8f}"
+            return f"{value:.8f}"
 
     with open(filename, 'w') as f:
-        # Begin the table
-        f.write(r"\begin{table}[htbp]")
+        # Begin the table environment
+        f.write(r"\begin{table*}[htbp]")  # Use table* for a full-width table
         f.write(r"\centering")
+
+        # Begin first minipage for Mean MSE table
+        f.write(r"\begin{minipage}[t]{0.48\linewidth}")
+        f.write(r"\centering")
+        f.write(r"\label{tab:mse_means}")
         f.write(r"\begin{tabular}{|l|" + "c|" * len(batches) + "}\n")
         f.write(r"\hline")
 
-        # Write the table header
+        # Write the table header for Mean MSE
         header = " Channel & " + " & ".join(batches) + r" \\\hline" + "\n"
         f.write(header)
 
-        # Combine scatter channels and fluoro channels into a single list
+        # Combine channels
         all_channels = scatter_channels + fluro_channels_panel
 
-        # Write each row: channel name + MSE differences for that channel in each batch
+        # Write Mean MSE table rows
         for i, channel in enumerate(all_channels):
             row = channel
             for j, batch in enumerate(batches):
-                mse_value = mse_differences[j][i]
-                # Use the format_mse_value function to format the number
-                row += f" & {format_mse_value(mse_value)}"
+                mse_value = mse_differences_means[j][i]
+                row += f" & {format_value(mse_value)}"
             row += r" \\" + "\n"
             f.write(row)
 
-        # End the table
-        f.write(r"\hline")
-        # Write the MSE differences for scatter and fluoro channels
+        # End Mean MSE table
         f.write(r"\hline ")
-        f.write(r"Mean MSE Difference & " + " & ".join([format_mse_value(mse) for mse in mse_difference_means.values()]) + r" \\" + "\n")
+        f.write(r"Mean & " + " & ".join([format_value(mse) for mse in mse_difference_means.values()]) + r" \\" + "\n")
         f.write(r"\hline")
         f.write(r"\end{tabular}")
-        f.write(r"\caption{MSE Differences for Scatter and Fluoro Channels across Batches}")
-        f.write(r"\label{tab:mse_differences}")
-        f.write(r"\end{table}")
+        f.write(r"\end{minipage}")
+        f.write(r"\hfill")  # Horizontal fill to separate the two tables
 
-def write_latex_std_table(results, filename):
-    batches = results['batches']
-    std_summaries = results['std_summaries']
-    mse_difference_stds = results['mse_difference_stds']
-
-    def format_mse_value(mse_value):
-        """Formats MSE value in scientific notation if it's below 10^-5, otherwise keeps it in float format."""
-        if abs(mse_value) < 1e-4:
-            return f"{mse_value:.2e}"
-        else:
-            return f"{mse_value:.8f}"
-
-    with open(filename, 'a') as f:  # 'a' mode to append to the existing file
-        # Begin the new table for standard deviations
-        f.write("\n")  # Add a newline for separation between tables
-        f.write(r"\begin{table}[htbp]")
+        # Begin second minipage for Std MSE table
+        f.write(r"\begin{minipage}[t]{0.48\linewidth}")
         f.write(r"\centering")
+        f.write(r"\caption{MSE Differences for Means (Left) and Standard Deviations (Right) across Batches}")
+        f.write(r"\label{tab:mse_stds}")
         f.write(r"\begin{tabular}{|l|" + "c|" * len(batches) + "}\n")
         f.write(r"\hline")
 
-        # Write the table header
-        header = " Channel & " + " & ".join(batches) + r" \\\hline" + "\n"
-        f.write(header)
+        # Write the table header for Std MSE
+        f.write(header)  # Header is the same as before
 
-        # Combine scatter channels and fluoro channels into a single list
-        all_channels = scatter_channels + fluro_channels_panel
-
-        # Calculate MSE for standard deviations
-        mse_differences_stds = [(std_summaries[batch] - std_summaries['Reference Dataset']) ** 2 for batch in batches]
-
-        # Write each row: channel name + MSE differences for standard deviations for each batch
+        # Write Std MSE table rows
         for i, channel in enumerate(all_channels):
             row = channel
             for j, batch in enumerate(batches):
                 mse_value = mse_differences_stds[j][i]
-                # Use the format_mse_value function to format the number
-                row += f" & {format_mse_value(mse_value)}"
+                row += f" & {format_value(mse_value)}"
             row += r" \\" + "\n"
             f.write(row)
 
-        # End the table
-        f.write(r"\hline\hline ")
-        # Write the MSE differences for standard deviations across scatter and fluoro channels
-        f.write(r"Mean MSE Difference & " + " & ".join([format_mse_value(mse) for mse in mse_difference_stds.values()]) + r" \\\hline")
+        # End Std MSE table
+        f.write(r"\hline ")
+        f.write(r"Mean & " + " & ".join([format_value(mse) for mse in mse_difference_stds.values()]) + r" \\" + "\n")
+        f.write(r"\hline")
         f.write(r"\end{tabular}")
-        f.write(r"\caption{MSE Differences for Scatter and Fluoro Channels Standard Deviations across Batches}")
-        f.write(r"\label{tab:mse_differences_stds}")
-        f.write(r"\end{table}")
+        f.write(r"\end{minipage}")
+
+        # End the table environment
+        f.write(r"\end{table*}")
 
 def write_latex_1d_tvd_table(results, filename):
     batches = results['batches']
@@ -248,7 +237,7 @@ def write_latex_1d_tvd_table(results, filename):
             f.write(row)
 
         # End the table
-        f.write(r"\hline\hline ")
+        f.write(r"\hline ")
         # Write the mean 1D TVD values across scatter and fluoro channels
         f.write(r"Mean 1D TVD & " + " & ".join([format_tvd_value(tvd) for tvd in mean_1d_tvd.values()]) + r" \\\hline")
         f.write(r"\end{tabular}")
@@ -294,6 +283,79 @@ def write_latex_cluster_mse_table(results, filename):
         f.write(r"\label{tab:cluster_mse}")
         f.write(r"\end{table}")
 
+def create_2d_tvd_heatmaps(results, fluro_channels_panel, dir_path, latex_filename):
+    import matplotlib.pyplot as plt
+    import numpy as np
+
+    batches = results['batches']
+    all_channels = fluro_channels_panel
+
+    for batch in batches:
+        if batch == 'Reference Dataset':
+            continue  # Skip reference dataset if necessary
+
+        tvd_matrix = results['2d_tvd'][batch]  # This should be a 2D numpy array
+
+        # Get indices of fluro_channels_panel in all_channels
+        indices = [all_channels.index(ch) for ch in fluro_channels_panel]
+
+        # Extract the submatrix corresponding to fluro_channels_panel x fluro_channels_panel
+        tvd_submatrix = tvd_matrix[np.ix_(indices, indices)]
+
+        num_channels = len(fluro_channels_panel)
+
+        # Calculate figure size based on number of channels
+        cell_size = 1.0  # Increase this value to make cells larger
+        fig_width = cell_size * num_channels
+        fig_height = cell_size * num_channels
+        fig, ax = plt.subplots(figsize=(fig_width, fig_height))
+
+        # Remove colors by setting a monochrome colormap and uniform data
+        im = ax.imshow(np.zeros_like(tvd_submatrix), cmap='gray', vmin=0, vmax=1)
+
+        # Place x-axis labels on top
+        ax.xaxis.tick_top()
+        ax.tick_params(top=True, bottom=False, labeltop=True, labelbottom=False, labelsize=14)
+
+        # Set ticks and labels with increased font size
+        ax.set_xticks(np.arange(num_channels))
+        ax.set_yticks(np.arange(num_channels))
+        ax.set_xticklabels(fluro_channels_panel, rotation=90, fontsize=14)
+        ax.set_yticklabels(fluro_channels_panel, fontsize=14)
+
+        # Remove grid lines and frame
+        ax.grid(False)
+        for edge, spine in ax.spines.items():
+            spine.set_visible(False)
+
+        # Annotate each cell with its corresponding value, with increased font size
+        for i in range(num_channels):
+            for j in range(num_channels):
+                value = tvd_submatrix[i, j]
+                ax.text(j, i, f"{value:.2e}", ha='center', va='center', color='white', fontsize=12)
+
+        # Draw gridlines to separate cells
+        ax.set_xticks(np.arange(-0.5, num_channels, 1), minor=True)
+        ax.set_yticks(np.arange(-0.5, num_channels, 1), minor=True)
+        ax.grid(which='minor', color='black', linestyle='-', linewidth=1)
+        ax.tick_params(which="minor", bottom=False, left=False)
+
+        plt.tight_layout()
+        image_filename = f'2d_tvd_{batch}.png'
+        plt.savefig(f'{dir_path}/{image_filename}', bbox_inches='tight', dpi=300)  # Higher DPI for better resolution
+        plt.close()
+
+        # Append LaTeX code to include this image
+        with open(latex_filename, 'a') as f:
+            f.write('\n')  # Add a newline
+            f.write(r'\begin{figure}[htbp]')
+            f.write(r'\centering')
+            f.write(f'\\includegraphics[width=\\linewidth]{{{image_filename}}}')
+            f.write(f'\\caption{{2D TVD Matrix for {batch}}}')
+            f.write(f'\\label{{fig:2d_tvd_{batch}}}')
+            f.write(r'\end{figure}')
+
+
 
 # Example usage
 if __name__ == "__main__":
@@ -311,7 +373,7 @@ if __name__ == "__main__":
     # Parse the content
     results = parse_results(file_content)
 
-    write_latex_mse_table(results, latex_path)
-    write_latex_std_table(results, latex_path)
-    write_latex_1d_tvd_table(results, latex_path)
+    write_latex_mean_std_tables_side_by_side(results, latex_path)
     write_latex_cluster_mse_table(results, latex_path)
+    write_latex_1d_tvd_table(results, latex_path)
+    create_2d_tvd_heatmaps(results, fluro_channels_panel, dir_path, latex_path)
