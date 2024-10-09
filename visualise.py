@@ -1,6 +1,7 @@
 import re
 import numpy as np
 import matplotlib.pyplot as plt  # Import matplotlib for plotting
+import ast
 
 
 scatter_channels = ['FSC-A', 'FSC-H', 'FSC-W', 'SSC-A', 'SSC-H', 'SSC-W']
@@ -45,8 +46,11 @@ def parse_results(file_content):
             match = re.search(r"(\w+\s?\w+):\s*(\[[^]]+\])", line)
             if match:
                 key = match.group(1).strip()
-                value_str = fix_array_syntax(match.group(2))
-                value = np.array(eval(value_str))
+                value_str = match.group(2)  # No need to fix array syntax
+                # Extract all numbers, including those in scientific notation
+                value_list = re.findall(r'[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?', value_str)
+                # Convert the list of strings to floats
+                value = np.array([float(x) for x in value_list])
                 parsed_data['mean_summaries'][key] = value
 
     # Extract MSE Difference in Means
@@ -63,8 +67,11 @@ def parse_results(file_content):
             match = re.search(r"(\w+\s?\w+):\s*(\[[^]]+\])", line)
             if match:
                 key = match.group(1).strip()
-                value_str = fix_array_syntax(match.group(2))
-                value = np.array(eval(value_str))
+                value_str = match.group(2)  # No need to fix array syntax
+                # Extract all numbers, including those in scientific notation
+                value_list = re.findall(r'[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?', value_str)
+                # Convert the list of strings to floats
+                value = np.array([float(x) for x in value_list])
                 parsed_data['std_summaries'][key] = value
 
     # Extract MSE Difference in Standard Deviations
@@ -357,7 +364,7 @@ def create_2d_tvd_heatmaps(results, fluro_channels_panel, dir_path, latex_filena
 # Example usage
 if __name__ == "__main__":
     batch = "Synthetic"
-    method = "rawdata"
+    method = "Spline_AE"
 
     dir_path = f"{batch}/{method}"
     results_path = f"{dir_path}/results.txt"
