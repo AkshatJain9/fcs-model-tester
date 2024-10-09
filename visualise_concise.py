@@ -49,8 +49,8 @@ def parse_results(file_content):
 
     return parsed_data
 
-# Function to write concise tables side by side
-def write_latex_summary_tables_side_by_side(results, filename):
+# Function to write a single summary table
+def write_latex_summary_table(results, filename):
     batches = results['batches']
     mse_difference_means = results['mse_difference_means']
     mse_difference_stds = results['mse_difference_stds']
@@ -69,100 +69,56 @@ def write_latex_summary_tables_side_by_side(results, filename):
         # Begin the table environment
         f.write(r"\begin{table*}[htbp]" + "\n")
         f.write(r"\centering" + "\n")
-        
-        # First minipage for MSE differences
-        f.write(r"\begin{minipage}[t]{0.48\linewidth}" + "\n")
-        f.write(r"\centering" + "\n")
-        f.write(r"\begin{tabular}{|l|" + "c|" * len(batches) + "}\n")
+
+        # Begin the tabular environment
+        num_columns = len(batches) + 1  # +1 for the Metric column
+        f.write(r"\begin{tabular}{|" + "l|" + "c|" * len(batches) + "}\n")
         f.write(r"\hline" + "\n")
-        
+
         # Write the table header
         header = " Metric & " + " & ".join(batches) + r" \\\hline" + "\n"
         f.write(header)
-        
-        # MSE Difference in Means
-        row = "MSE Difference in Means"
-        for batch in batches:
-            value = mse_difference_means.get(batch, 0)
-            row += f" & {format_value(value)}"
-        row += r" \\" + "\n"
-        f.write(row)
-        
-        # MSE Difference in Stds
-        row = "MSE Difference in Stds"
-        for batch in batches:
-            value = mse_difference_stds.get(batch, 0)
-            row += f" & {format_value(value)}"
-        row += r" \\" + "\n"
-        f.write(row)
-        
+
+        # Metrics to include
+        metrics = [
+            ("MSE Difference in Means", mse_difference_means),
+            ("MSE Difference in Stds", mse_difference_stds),
+            ("Mean 1D TVD", mean_1d_tvd),
+            ("Mean 2D TVD", mean_2d_tvd),
+            ("Average Cluster Distance", average_cluster_distance)
+        ]
+
+        # Write each metric row
+        for metric_name, metric_data in metrics:
+            row = metric_name
+            for batch in batches:
+                value = metric_data.get(batch, 0)
+                row += f" & {format_value(value)}"
+            row += r" \\" + "\n"
+            f.write(row)
+
         # End the table
         f.write(r"\hline" + "\n")
         f.write(r"\end{tabular}" + "\n")
-        f.write(r"\caption{MSE Differences across Batches}" + "\n")
-        f.write(r"\label{tab:mse_differences}" + "\n")
-        f.write(r"\end{minipage}" + "\n")
-        
-        f.write(r"\hfill" + "\n")  # Horizontal fill to separate the two tables
-        
-        # Second minipage for TVD and Cluster Distance
-        f.write(r"\begin{minipage}[t]{0.48\linewidth}" + "\n")
-        f.write(r"\centering" + "\n")
-        f.write(r"\begin{tabular}{|l|" + "c|" * len(batches) + "}\n")
-        f.write(r"\hline" + "\n")
-        
-        # Write the table header
-        f.write(header)
-        
-        # Mean 1D TVD
-        row = "Mean 1D TVD"
-        for batch in batches:
-            value = mean_1d_tvd.get(batch, 0)
-            row += f" & {format_value(value)}"
-        row += r" \\" + "\n"
-        f.write(row)
-        
-        # Mean 2D TVD
-        row = "Mean 2D TVD"
-        for batch in batches:
-            value = mean_2d_tvd.get(batch, 0)
-            row += f" & {format_value(value)}"
-        row += r" \\" + "\n"
-        f.write(row)
-        
-        # Average Cluster Distance
-        row = "Average Cluster Distance"
-        for batch in batches:
-            value = average_cluster_distance.get(batch, 0)
-            row += f" & {format_value(value)}"
-        row += r" \\" + "\n"
-        f.write(row)
-        
-        # End the table
-        f.write(r"\hline" + "\n")
-        f.write(r"\end{tabular}" + "\n")
-        f.write(r"\caption{TVD and Cluster Distance across Batches}" + "\n")
-        f.write(r"\label{tab:tvd_cluster}" + "\n")
-        f.write(r"\end{minipage}" + "\n")
-        
-        # End the table environment
+        f.write(r"\caption{Summary of Metrics across Batches}" + "\n")
+        f.write(r"\label{tab:summary_metrics}" + "\n")
         f.write(r"\end{table*}" + "\n")
 
 # Example usage
 if __name__ == "__main__":
-    batch = "Synthetic"
-    method = "rawdata"
+    batch = "ENU"
+    method = "CytoRUV"
 
     dir_path = f"{batch}/{method}"
-    results_path = f"{dir_path}/results.txt"
-    latex_path = f"{dir_path}/latex.txt"
+    results_path = f"{dir_path}/results_e2.txt"
+    latex_path = f"{dir_path}/latex_concise2.txt"
 
-    # Read the contents of the file (replace 'your_file.txt' with the actual file path)
+    # Read the contents of the file (replace 'results.txt' with the actual file path)
     with open(results_path, 'r') as f:
         file_content = f.read()
 
     # Parse the content
     results = parse_results(file_content)
 
-    # Write the concise tables side by side
-    write_latex_summary_tables_side_by_side(results, latex_path)
+    # Write the concise single summary table
+    write_latex_summary_table(results, latex_path)

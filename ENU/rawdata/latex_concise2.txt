@@ -1,0 +1,15 @@
+\begin{table*}[htbp]
+\centering
+\begin{tabular}{|l|c|c|c|c|c|c|}
+\hline
+ Metric & Plate 28528_N & Plate 39630_N & Plate 28332 & Plate 29178_N & Plate 19635 _CD8 & Plate 36841 \\\hline
+MSE Difference in Means & 4.12e-04 & 0.00615964 & 0.00225785 & 0.00730545 & 0.01283856 & 0.00432261 \\
+MSE Difference in Stds & 1.50e-04 & 9.94e-04 & 0.00110697 & 0.00116055 & 0.00200729 & 6.73e-04 \\
+Mean 1D TVD & 0.18465114 & 0.43384736 & 0.34509036 & 0.47750570 & 0.72067208 & 0.40345122 \\
+Mean 2D TVD & 0.24490383 & 0.52175453 & 0.41643884 & 0.40710599 & 0.74912646 & 0.52225076 \\
+Average Cluster Distance & 0.00912415 & 0.02402459 & 0.01948004 & 0.01970328 & 0.02010014 & 0.03048728 \\
+\hline
+\end{tabular}
+\caption{Summary of Metrics across Batches}
+\label{tab:summary_metrics}
+\end{table*}

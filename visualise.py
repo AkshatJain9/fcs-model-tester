@@ -157,7 +157,7 @@ def write_latex_mean_std_tables_side_by_side(results, filename):
         f.write(header)
 
         # Combine channels
-        all_channels = scatter_channels + fluro_channels_panel
+        all_channels = scatter_channels + fluro_channels_enu
 
         # Write Mean MSE table rows
         for i, channel in enumerate(all_channels):
@@ -231,7 +231,7 @@ def write_latex_1d_tvd_table(results, filename):
         f.write(header)
 
         # Combine scatter channels and fluoro channels into a single list
-        all_channels = scatter_channels + fluro_channels_panel
+        all_channels = scatter_channels + fluro_channels_enu
 
         # Write each row: channel name + 1D TVD values for each batch
         for i, channel in enumerate(all_channels):
@@ -363,11 +363,11 @@ def create_2d_tvd_heatmaps(results, fluro_channels_panel, dir_path, latex_filena
 
 # Example usage
 if __name__ == "__main__":
-    batch = "Synthetic"
-    method = "Spline_AE"
+    batch = "ENU"
+    method = "rawdata"
 
     dir_path = f"{batch}/{method}"
-    results_path = f"{dir_path}/results.txt"
+    results_path = f"{dir_path}/results_e1.txt"
     latex_path = f"{dir_path}/latex.txt"
 
     # Read the contents of the file (replace 'your_file.txt' with the actual file path)
