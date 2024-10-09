@@ -45,7 +45,7 @@ CD62L & 2.89e-06 & 3.07e-06 \\
 \hline Batch & Panel 2 & Panel 3 \\\hline
 Cluster MSE & 0.00400084 & 0.00399349 \\
 \hline\end{tabular}\caption{Average Cluster MSE Differences across Batches}\label{tab:cluster_mse}\end{table}
-\begin{table}[htbp]\centering\begin{tabular}{|l|c|c|}
+\begin{table}[H]\centering\begin{tabular}{|l|c|c|}
 \hline Channel & Panel 2 & Panel 3 \\\hline
 FSC-A & 0.01549247 & 0.02576178 \\
 FSC-H & 0.03169660 & 0.02862082 \\
@@ -66,5 +66,5 @@ LD & 0.04671759 & 0.07943023 \\
 CD19 & 0.28726872 & 0.31350739 \\
 CD62L & 0.02885146 & 0.02919655 \\
 \hline Mean 1D TVD & 0.09131554 & 0.13520478 \\\hline\end{tabular}\caption{1D TVD for Scatter and Fluoro Channels across Batches}\label{tab:1d_tvd}\end{table}
-\begin{figure}[htbp]\centering\includegraphics[width=\linewidth]{2d_tvd_Panel 2.png}\caption{2D TVD Matrix for Panel 2}\label{fig:2d_tvd_Panel 2}\end{figure}
-\begin{figure}[htbp]\centering\includegraphics[width=\linewidth]{2d_tvd_Panel 3.png}\caption{2D TVD Matrix for Panel 3}\label{fig:2d_tvd_Panel 3}\end{figure}
+\begin{figure}[htbp]\centering\includegraphics[width=0.5\linewidth]{figures/results/Panel 2_rawdata_2d_tvd_Panel 2.png}\caption{2D TVD Matrix for Panel 2}\label{fig:Panel 2_rawdata_2d_tvd_Panel 2}\end{figure}
+\begin{figure}[htbp]\centering\includegraphics[width=0.5\linewidth]{figures/results/Panel 3_rawdata_2d_tvd_Panel 3.png}\caption{2D TVD Matrix for Panel 3}\label{fig:Panel 3_rawdata_2d_tvd_Panel 3}\end{figure}

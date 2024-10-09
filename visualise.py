@@ -214,7 +214,7 @@ def write_latex_1d_tvd_table(results, filename):
     with open(filename, 'a') as f:  # 'a' mode to append to the existing file
         # Begin the new table for 1D TVD
         f.write("\n")  # Add a newline for separation between tables
-        f.write(r"\begin{table}[htbp]")
+        f.write(r"\begin{table}[H]")
         f.write(r"\centering")
         f.write(r"\begin{tabular}{|l|" + "c|" * len(batches) + "}\n")
         f.write(r"\hline")
@@ -283,10 +283,8 @@ def write_latex_cluster_mse_table(results, filename):
         f.write(r"\label{tab:cluster_mse}")
         f.write(r"\end{table}")
 
-def create_2d_tvd_heatmaps(results, fluro_channels_panel, dir_path, latex_filename):
-    import matplotlib.pyplot as plt
-    import numpy as np
-
+def create_2d_tvd_heatmaps(results, fluro_channels_panel, dir_path, latex_filename, batch, tech):
+    
     batches = results['batches']
     all_channels = fluro_channels_panel
 
@@ -341,20 +339,19 @@ def create_2d_tvd_heatmaps(results, fluro_channels_panel, dir_path, latex_filena
         ax.tick_params(which="minor", bottom=False, left=False)
 
         plt.tight_layout()
-        image_filename = f'2d_tvd_{batch}.png'
+        image_filename = f'{batch}_{tech}_2d_tvd_{batch}.png'
         plt.savefig(f'{dir_path}/{image_filename}', bbox_inches='tight', dpi=300)  # Higher DPI for better resolution
         plt.close()
 
         # Append LaTeX code to include this image
         with open(latex_filename, 'a') as f:
             f.write('\n')  # Add a newline
-            f.write(r'\begin{figure}[htbp]')
+            f.write(r'\begin{figure}[H]')
             f.write(r'\centering')
-            f.write(f'\\includegraphics[width=\\linewidth]{{{image_filename}}}')
+            f.write(f'\\includegraphics[width=0.7\\linewidth]{{{f"figures/results/{image_filename}"}}}')
             f.write(f'\\caption{{2D TVD Matrix for {batch}}}')
-            f.write(f'\\label{{fig:2d_tvd_{batch}}}')
+            f.write(f'\\label{{fig:{batch}_{tech}_2d_tvd_{batch}}}')
             f.write(r'\end{figure}')
-
 
 
 # Example usage
@@ -376,4 +373,4 @@ if __name__ == "__main__":
     write_latex_mean_std_tables_side_by_side(results, latex_path)
     write_latex_cluster_mse_table(results, latex_path)
     write_latex_1d_tvd_table(results, latex_path)
-    create_2d_tvd_heatmaps(results, fluro_channels_panel, dir_path, latex_path)
+    create_2d_tvd_heatmaps(results, fluro_channels_panel, dir_path, latex_path, batch, method)
