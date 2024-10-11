@@ -1,0 +1,15 @@
+\begin{table*}[htbp]
+\centering
+\begin{tabular}{|l|c|c|}
+\hline
+ Metric & Panel 2 & Panel 3 \\\hline
+MSE Difference in Means & 8.20e-05 & 1.71e-04 \\
+MSE Difference in Stds & 5.81e-05 & 1.40e-04 \\
+Mean 1D TVD & 0.08408363 & 0.12491164 \\
+Mean 2D TVD & 0.17008318 & 0.25171104 \\
+Average Cluster Distance & 0.00397782 & 7.94e-04 \\
+\hline
+\end{tabular}
+\caption{Summary of Metrics across Batches}
+\label{tab:summary_metrics}
+\end{table*}

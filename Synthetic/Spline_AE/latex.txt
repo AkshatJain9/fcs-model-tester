@@ -1,0 +1,70 @@
+\begin{table*}[htbp]\centering\begin{minipage}[t]{0.48\linewidth}\centering\label{tab:mse_means}\begin{tabular}{|l|c|c|}
+\hline Channel & Panel 2 & Panel 3 \\\hline
+FSC-A & 2.01e-07 & 8.40e-08 \\
+FSC-H & 6.61e-07 & 7.69e-10 \\
+FSC-W & 1.12e-07 & 3.24e-07 \\
+SSC-A & 5.18e-09 & 3.39e-07 \\
+SSC-H & 1.54e-07 & 6.25e-07 \\
+SSC-W & 3.94e-07 & 3.89e-07 \\
+CD8 & 1.04e-08 & 5.55e-09 \\
+B220 & 3.15e-08 & 9.91e-08 \\
+CD44 & 5.33e-09 & 8.22e-08 \\
+CD3 & 7.10e-06 & 6.56e-06 \\
+IgD & 2.25e-06 & 2.05e-06 \\
+CD25 & 1.45e-08 & 1.26e-08 \\
+Ly6C & 1.61e-07 & 2.14e-07 \\
+NK1.1 & 1.29e-08 & 3.61e-09 \\
+IgM / CD4 & 6.06e-07 & 6.81e-07 \\
+LD & 6.51e-11 & 8.32e-10 \\
+CD19 & 3.04e-07 & 9.74e-08 \\
+CD62L & 1.42e-06 & 1.89e-06 \\
+\hline Mean & 7.47e-07 & 7.47e-07 \\
+\hline\end{tabular}\end{minipage}\hfill\begin{minipage}[t]{0.48\linewidth}\centering\caption{MSE Differences for Means (Left) and Standard Deviations (Right) across Batches}\label{tab:mse_stds}\begin{tabular}{|l|c|c|}
+\hline Channel & Panel 2 & Panel 3 \\\hline
+FSC-A & 4.67e-07 & 2.03e-05 \\
+FSC-H & 2.07e-07 & 3.11e-06 \\
+FSC-W & 3.15e-06 & 1.73e-06 \\
+SSC-A & 2.26e-06 & 4.90e-06 \\
+SSC-H & 1.95e-07 & 2.28e-08 \\
+SSC-W & 6.89e-06 & 5.16e-06 \\
+CD8 & 2.53e-04 & 1.39e-04 \\
+B220 & 3.53e-06 & 1.45e-05 \\
+CD44 & 2.74e-06 & 1.05e-05 \\
+CD3 & 3.02e-05 & 4.96e-05 \\
+IgD & 1.35e-05 & 1.34e-05 \\
+CD25 & 5.24e-05 & 6.08e-05 \\
+Ly6C & 3.09e-06 & 2.34e-05 \\
+NK1.1 & 3.38e-07 & 3.19e-05 \\
+IgM / CD4 & 1.88e-06 & 1.04e-05 \\
+LD & 9.78e-06 & 2.06e-05 \\
+CD19 & 3.39e-05 & 2.37e-06 \\
+CD62L & 2.52e-05 & 6.46e-05 \\
+\hline Mean & 2.46e-05 & 2.65e-05 \\
+\hline\end{tabular}\end{minipage}\end{table*}
+\begin{table}[htbp]\centering\begin{tabular}{|l|c|c|}
+\hline Batch & Panel 2 & Panel 3 \\\hline
+Cluster MSE & 0.00673935 & 0.00514833 \\
+\hline\end{tabular}\caption{Average Cluster MSE Differences across Batches}\label{tab:cluster_mse}\end{table}
+\begin{table}[H]\centering\begin{tabular}{|l|c|c|}
+\hline Channel & Panel 2 & Panel 3 \\\hline
+FSC-A & 0.01549247 & 0.02576178 \\
+FSC-H & 0.03169660 & 0.02862082 \\
+FSC-W & 0.05166197 & 0.05984693 \\
+SSC-A & 0.02536436 & 0.05256019 \\
+SSC-H & 0.02142276 & 0.04495320 \\
+SSC-W & 0.06691369 & 0.10520497 \\
+CD8 & 0.17818914 & 0.14401256 \\
+B220 & 0.06233735 & 0.12289639 \\
+CD44 & 0.05077715 & 0.06289681 \\
+CD3 & 0.11995691 & 0.10888272 \\
+IgD & 0.05011433 & 0.09246877 \\
+CD25 & 0.08136556 & 0.06297364 \\
+Ly6C & 0.07214856 & 0.09863811 \\
+NK1.1 & 0.04189852 & 0.08141221 \\
+IgM / CD4 & 0.08247835 & 0.10236523 \\
+LD & 0.03028621 & 0.05156536 \\
+CD19 & 0.19871097 & 0.10127569 \\
+CD62L & 0.04629976 & 0.11132297 \\
+\hline Mean 1D TVD & 0.06817304 & 0.08098102 \\\hline\end{tabular}\caption{1D TVD for Scatter and Fluoro Channels across Batches}\label{tab:1d_tvd}\end{table}
+\begin{figure}[H]\centering\includegraphics[width=0.7\linewidth]{figures/results/Panel 2_Spline_AE_2d_tvd_Panel 2.png}\caption{2D TVD Matrix for Panel 2}\label{fig:Panel 2_Spline_AE_2d_tvd_Panel 2}\end{figure}
+\begin{figure}[H]\centering\includegraphics[width=0.7\linewidth]{figures/results/Panel 3_Spline_AE_2d_tvd_Panel 3.png}\caption{2D TVD Matrix for Panel 3}\label{fig:Panel 3_Spline_AE_2d_tvd_Panel 3}\end{figure}
