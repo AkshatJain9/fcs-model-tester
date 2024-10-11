@@ -2,6 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import gaussian_kde
 
+labels = "Reference Batch", "Target Batch", "Existing Method", "Our Method"
+
 def plot_all_enu(data):
     for i in range(6, data.shape[1]):
         for j in range(i + 1, data.shape[1]):
@@ -47,12 +49,8 @@ def plot_all_enu_together(data1, data2, data3, data4):
     num_datasets = len(data_list)
     num_channels = data1.shape[1]  # Assuming all datasets have the same number of columns
 
-    for i in range(6, num_channels):
-        for j in range(i + 1, num_channels):
-            # Create a figure with 2x2 subplots
-            fig, axs = plt.subplots(2, 2, figsize=(20, 20))
-            axs = axs.flatten()
-
+    for i in range(7, 8):  # Only i=7
+        for j in range(12, 13):  # Only j=12
             # Prepare the contour data from data1
             channel1_data1 = data1[:, i]
             channel2_data1 = data1[:, j]
@@ -81,11 +79,13 @@ def plot_all_enu_together(data1, data2, data3, data4):
 
             # Choose a single contour level to show the general shape
             density_values = density_grid.flatten()
-            # For example, use the 95th percentile
-            contour_level = np.percentile(density_values, 75)  # Lower percentile for outer contour
+            contour_level = np.percentile(density_values, 75)  # Adjust percentile as needed
 
-            # Now, loop over datasets to create subplots
+            # Now, loop over datasets to create individual plots
             for idx, data in enumerate(data_list):
+                # Create a figure for each dataset
+                fig, ax = plt.subplots(figsize=(10, 10))
+
                 # Check if the data has enough columns
                 if data.shape[1] <= max(i, j):
                     print(f"Data {idx+1} does not have enough columns for channels {i} and {j}.")
@@ -110,8 +110,7 @@ def plot_all_enu_together(data1, data2, data3, data4):
                 idx_density = density.argsort()
                 x, y, density = points[:, 0][idx_density], points[:, 1][idx_density], density[idx_density]
 
-                # Create the scatter plot in the appropriate subplot
-                ax = axs[idx]
+                # Create the scatter plot
                 scatter = ax.scatter(x, y, c=density, s=1, cmap='viridis')
 
                 # Set xlim and ylim to match data1
@@ -122,22 +121,22 @@ def plot_all_enu_together(data1, data2, data3, data4):
                 ax.contour(xx, yy, density_grid, levels=[contour_level], colors='red', linewidths=2)
 
                 # Set plot titles and labels
-                ax.set_title(f'Dataset {idx+1}: Channels {i} vs {j}')
-                ax.set_xlabel(f'Channel {i}')
-                ax.set_ylabel(f'Channel {j}')
+                ax.set_xlabel('IgM')
+                ax.set_ylabel('CD4')
 
                 # Remove top and right spines
                 ax.spines['top'].set_visible(False)
                 ax.spines['right'].set_visible(False)
 
-            # Adjust layout and add a main title
-            plt.tight_layout(rect=[0, 0.03, 1, 0.95])
-            plt.suptitle(f'Density Scatter Plots for Channels {i} vs {j}', fontsize=20)
+                # Set title
+                ax.set_title(labels[idx], fontsize=16)
 
-            # Save the combined figure
-            plt.savefig(f'zchannels_{i}_vs_{j}_density_scatter_combined2.png', dpi=300, bbox_inches='tight')
-            plt.close()
+                # Adjust layout
+                plt.tight_layout()
 
+                # Save the figure for this dataset with high resolution
+                plt.savefig(labels[idx], dpi=300, bbox_inches='tight')
+                plt.close()
 if __name__ == '__main__':
     data_ref = "Plate 27902_N"
     data_target = "Plate 19635_CD8"
