@@ -53,8 +53,38 @@ def plot_all_enu_together(data1, data2, data3, data4):
             fig, axs = plt.subplots(2, 2, figsize=(20, 20))
             axs = axs.flatten()
 
-            xmin, xmax, ymin, ymax = None, None, None, None
+            # Prepare the contour data from data1
+            channel1_data1 = data1[:, i]
+            channel2_data1 = data1[:, j]
 
+            # Stack the channels to create a 2D array of points
+            points_data1 = np.vstack([channel1_data1, channel2_data1]).T
+
+            # If there are too many points, sample a subset
+            if len(points_data1) > 20000:
+                indices = np.random.choice(len(points_data1), 20000, replace=False)
+                points_data1 = points_data1[indices]
+
+            # Compute KDE on data1
+            kde_data1 = gaussian_kde(points_data1.T)
+
+            # Determine x and y ranges
+            xmin, xmax = points_data1[:, 0].min(), points_data1[:, 0].max()
+            ymin, ymax = points_data1[:, 1].min(), points_data1[:, 1].max()
+
+            # Create a regular grid over the data1 range
+            xx, yy = np.mgrid[xmin:xmax:100j, ymin:ymax:100j]
+            grid_coords = np.vstack([xx.ravel(), yy.ravel()])
+
+            # Evaluate KDE on grid
+            density_grid = kde_data1(grid_coords).reshape(xx.shape)
+
+            # Choose a single contour level to show the general shape
+            density_values = density_grid.flatten()
+            # For example, use the 95th percentile
+            contour_level = np.percentile(density_values, 75)  # Lower percentile for outer contour
+
+            # Now, loop over datasets to create subplots
             for idx, data in enumerate(data_list):
                 # Check if the data has enough columns
                 if data.shape[1] <= max(i, j):
@@ -80,11 +110,6 @@ def plot_all_enu_together(data1, data2, data3, data4):
                 idx_density = density.argsort()
                 x, y, density = points[:, 0][idx_density], points[:, 1][idx_density], density[idx_density]
 
-                # For data1, store the axis limits
-                if idx == 0:
-                    xmin, xmax = x.min(), x.max()
-                    ymin, ymax = y.min(), y.max()
-
                 # Create the scatter plot in the appropriate subplot
                 ax = axs[idx]
                 scatter = ax.scatter(x, y, c=density, s=1, cmap='viridis')
@@ -92,6 +117,9 @@ def plot_all_enu_together(data1, data2, data3, data4):
                 # Set xlim and ylim to match data1
                 ax.set_xlim(xmin, xmax)
                 ax.set_ylim(ymin, ymax)
+
+                # Overlay the contour plot from data1
+                ax.contour(xx, yy, density_grid, levels=[contour_level], colors='red', linewidths=2)
 
                 # Set plot titles and labels
                 ax.set_title(f'Dataset {idx+1}: Channels {i} vs {j}')
