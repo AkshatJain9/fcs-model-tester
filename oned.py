@@ -52,6 +52,8 @@ def plot_fluoro_hist_compare(data_list, names=None, synth_batch=True):
     else:
         labels = fluro_channels_enu
 
+    colors = sns.color_palette("bright", len(data_list))
+
     # Iterate over channels starting from the 7th (index 6)
     for i, ax in enumerate(axs2):
         channel_index = i + 6
@@ -67,8 +69,7 @@ def plot_fluoro_hist_compare(data_list, names=None, synth_batch=True):
             else:
                 data_name = f'Dataset {dataset_idx+1}'
             hist, bin_edges = generate_histogram(data, channel_index, min_val, max_val)
-            ax.bar(bin_edges[:-1], hist, width=(bin_edges[1] - bin_edges[0]), alpha=0.5, 
-                   label=data_name)
+            ax.plot(bin_edges[:-1], hist, label=data_name, color=colors[dataset_idx])
 
         # Set axis labels using the provided labels
         ax.set_xlabel(labels[i] + " - Logicle Transformed Value")
@@ -145,3 +146,18 @@ def plot_fluoro_hist_compare_channel(data_list, i, names=None, synth_batch=True)
     plt.tight_layout()
     plt.savefig(f'fluro_histograms_compare_channel_{i}.png')
     plt.close()
+
+if __name__ == "__main__":
+    dataset = "Synthetic"
+    directory = "CytoRUV"
+
+    batches = ["Panel1", "Panel2", "Panel3"]
+    data_list = []
+    names = []
+    for batch in batches:
+        filename = f"{dataset}/{directory}/{batch}.npy"
+        data = np.load(filename)
+        data_list.append(data)
+        names.append(batch)
+
+    plot_fluoro_hist_compare(data_list, names, synth_batch=True)

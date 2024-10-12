@@ -119,15 +119,16 @@ def plot_twod(data_list, i, j, synth_batch=True, labels=None):
 
                 
 if __name__ == '__main__':
-    data_ref = "Plate 27902_N"
-    data_target = "Plate 19635_CD8"
+    dataset = "Synthetic"
+    directory = "CytoRUV"
 
-    method_existing = "CytofBatchAdjust_27902_N"
-    method_new = "AE_Spline_27902"
+    batches = ["Panel1", "Panel2", "Panel3"]
+    data_list = []
+    names = []
+    for batch in batches:
+        filename = f"{dataset}/{directory}/{batch}.npy"
+        data = np.load(filename)
+        data_list.append(data)
+        names.append(batch)
 
-    raw_data_ref_path = f'./ENU/rawdata/{data_ref}.npy'
-    raw_data_target_path = f'./ENU/rawdata/{data_target}.npy'
-    target_processed_old = f'./ENU/{method_existing}/{data_target}.npy'
-    target_processed_new = f'./ENU/{method_new}/{data_target}.npy'
-
-    plot_twod(np.load(raw_data_ref_path), np.load(raw_data_target_path), np.load(target_processed_old), np.load(target_processed_new))
+    plot_twod(data_list, 6, 7, synth_batch=True, labels=names)

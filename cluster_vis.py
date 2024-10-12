@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
+import seaborn as sns
 
 def plot_cluster_centers_pca(data_list, K, dataset_names=None):
     """
@@ -58,12 +59,13 @@ def plot_cluster_centers_pca(data_list, K, dataset_names=None):
     # Step 4: Plot the projected cluster centers
     plt.figure(figsize=(10,8))
     markers = ['o', 's', '^', 'D', 'v', '>', '<', 'p', '*', 'h']  # markers for up to 10 datasets
-    colors = plt.cm.get_cmap('tab10', num_datasets)
+    colors = sns.color_palette("bright", len(data_list))
     for idx, projected_centers in enumerate(projected_centers_list):
         plt.scatter(projected_centers[:,0], projected_centers[:,1], 
                     label=dataset_names[idx],
                     marker=markers[idx % len(markers)],
-                    color=colors(idx))
+                    color=colors[idx],
+                    s=100)
     plt.xlabel('PCA Component 1')
     plt.ylabel('PCA Component 2')
     plt.title('Projected Cluster Centers of Datasets')
@@ -72,3 +74,19 @@ def plot_cluster_centers_pca(data_list, K, dataset_names=None):
     plt.savefig('cluster_centers_pca.png')
     plt.close()
     print("Plot saved as 'cluster_centers_pca.png'.")
+
+
+if __name__ == "__main__":
+    dataset = "Synthetic"
+    directory = "CytoRUV"
+
+    batches = ["Panel1", "Panel2", "Panel3"]
+    data_list = []
+    names = []
+    for batch in batches:
+        filename = f"{dataset}/{directory}/{batch}.npy"
+        data = np.load(filename)
+        data_list.append(data)
+        names.append(batch)
+
+    plot_cluster_centers_pca(data_list, K=13, dataset_names=names)
