@@ -74,6 +74,4 @@ Mean 2D TVD for Panel 3:
 -------------------------
 Average Cluster Distance:
 Average Cluster Distance for Panel 2: 0.006352463275836924
-Average Mahalanobis Shift for Panel 2: 0.3472407640613865
 Average Cluster Distance for Panel 3: 0.0063003517149662755
-Average Mahalanobis Shift for Panel 3: 0.4358923350676214
