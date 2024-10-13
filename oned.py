@@ -19,52 +19,70 @@ def generate_histogram(panel_np, index, min_val, max_val):
     return hist, bin_edges
 
 
-def plot_fluoro_hist_compare(data_list, names=None, synth_batch=True):
+def plot_fluoro_hist_compare(data_list, names=None, idx=None, synth_batch=True, file_name=None):
     """
     Plots histograms comparing fluorescence data across multiple datasets.
 
     Parameters:
         data_list (list of numpy arrays): A list of datasets to be compared.
-        name (str): Name used for labeling and saving the plot.
+        names (list of str): Names used for labeling the datasets.
+        idx (int or list of ints): Index or indices of columns to plot. If None, plot all columns starting from index 6.
         synth_batch (bool): If True, use synthetic batch labels; otherwise, use default labels.
+        file_name (str): Name used for saving the plot.
     """
     num_datasets = len(data_list)
-    
+
     if num_datasets < 2:
         print("Error: At least two datasets are required for comparison.")
         return
-    
+
     num_channels = data_list[0].shape[1]
-    
+
     # Ensure all datasets have the same number of channels
     for data in data_list:
         if data.shape[1] != num_channels:
             print("Error: All datasets must have the same number of channels.")
             return
 
-    # Plot the remaining channels, assuming we skip the first 6
-    remaining_channels = num_channels - 6
+    # Determine the indices of channels to plot
+    if idx is not None:
+        # If idx is a single integer, convert it to a list
+        if isinstance(idx, int):
+            channels_to_plot = [idx]
+        else:
+            channels_to_plot = idx  # Assume idx is iterable
+    else:
+        # Plot all channels starting from index 6
+        channels_to_plot = list(range(6, num_channels))
+
+    remaining_channels = len(channels_to_plot)
+    if remaining_channels == 0:
+        print("Error: No channels to plot.")
+        return
+
     fig2, axs2 = plt.subplots(remaining_channels, 1, figsize=(8, 2 * remaining_channels))
 
+    # If only one subplot, axs2 may not be a list, so make it into a list
+    if remaining_channels == 1:
+        axs2 = [axs2]
+
     # Choose labels based on synth_batch flag
+    labels_full = [f'Channel {i}' for i in range(num_channels)]
     if synth_batch:
-        labels = fluro_channels_panel
+        labels_full[6:] = fluro_channels_panel
     else:
-        labels = fluro_channels_enu
+        labels_full[6:] = fluro_channels_enu
 
     colors = sns.color_palette("bright", len(data_list))
 
-    # Iterate over channels starting from the 7th (index 6)
-    for i, ax in enumerate(axs2):
-        channel_index = i + 6
-        
+    for channel_index, ax in zip(channels_to_plot, axs2):
         # Determine the min and max values across all datasets for the current channel
         min_val = np.min([np.min(data[:, channel_index]) for data in data_list])
         max_val = np.max([np.max(data[:, channel_index]) for data in data_list])
-        
+
         # Plot histograms for each dataset
         for dataset_idx, data in enumerate(data_list):
-            if (names is not None):
+            if names is not None:
                 data_name = names[dataset_idx]
             else:
                 data_name = f'Dataset {dataset_idx+1}'
@@ -72,17 +90,21 @@ def plot_fluoro_hist_compare(data_list, names=None, synth_batch=True):
             ax.plot(bin_edges[:-1], hist, label=data_name, color=colors[dataset_idx])
 
         # Set axis labels using the provided labels
-        ax.set_xlabel(labels[i] + " - Logicle Transformed Value")
+        ax.set_xlabel(labels_full[channel_index] + " - Logicle Transformed Value")
         ax.set_ylabel('Frequency (Relative)')
         ax.legend()
 
     # Adjust layout and save the figure
     plt.tight_layout()
-    plt.savefig(f'fluro_histograms_compare.png')
+    if file_name is not None:
+        plt.savefig(f'fluro_histograms_compare_{file_name}.png')
+    else:
+        plt.savefig(f'fluro_histograms_compare.png')
     plt.close()
 
 
-def plot_fluoro_hist_compare_channel(data_list, i, names=None, synth_batch=True):
+
+def plot_fluoro_hist_compare_channel(data_list, i, names=None, synth_batch=True, file_name=None):
     """
     Plots histograms comparing fluorescence data for a specific channel across multiple datasets.
 
@@ -144,14 +166,17 @@ def plot_fluoro_hist_compare_channel(data_list, i, names=None, synth_batch=True)
 
     # Adjust layout and save the figure
     plt.tight_layout()
-    plt.savefig(f'fluro_histograms_compare_channel_{i}.png')
+    if file_name is not None:
+        plt.savefig(f'fluro_histograms_compare_channel_{file_name}_{labels[i]}.png')
+    else:
+        plt.savefig(f'fluro_histograms_compare_channel_{labels[i]}.png')
     plt.close()
 
 if __name__ == "__main__":
     dataset = "Synthetic"
-    directory = "CytoRUV"
+    directory = "rawdata"
 
-    batches = ["Panel1", "Panel2", "Panel3"]
+    batches = ["Panel1", "Panel3"]
     data_list = []
     names = []
     for batch in batches:
@@ -160,4 +185,5 @@ if __name__ == "__main__":
         data_list.append(data)
         names.append(batch)
 
-    plot_fluoro_hist_compare(data_list, names, synth_batch=True)
+    # plot_fluoro_hist_compare(data_list, names, synth_batch=True, file_name=directory)
+    plot_fluoro_hist_compare(data_list, idx=4, names=names, synth_batch=True, file_name=directory)
