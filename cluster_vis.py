@@ -4,7 +4,7 @@ from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
 import seaborn as sns
 
-def plot_cluster_centers_pca(data_list, K, dataset_names=None):
+def plot_cluster_centers_pca(data_list, K, dataset_names=None, filename=None):
     """
     Runs KMeans clustering on each dataset in data_list with K clusters.
     Performs PCA on the cluster centers of the first dataset.
@@ -38,7 +38,7 @@ def plot_cluster_centers_pca(data_list, K, dataset_names=None):
     for idx, data in enumerate(data_list):
         print(f"Running KMeans for {dataset_names[idx]}...")
         kmeans = KMeans(n_clusters=K, random_state=0)
-        kmeans.fit(data)
+        kmeans.fit(data[:, 6:])
         cluster_centers = kmeans.cluster_centers_
         cluster_centers_list.append(cluster_centers)
         print(f"KMeans for {dataset_names[idx]} completed.")
@@ -61,8 +61,15 @@ def plot_cluster_centers_pca(data_list, K, dataset_names=None):
     markers = ['o', 's', '^', 'D', 'v', '>', '<', 'p', '*', 'h']  # markers for up to 10 datasets
     colors = sns.color_palette("bright", len(data_list))
     for idx, projected_centers in enumerate(projected_centers_list):
+        name  = dataset_names[idx]
+        if (name == "Panel2"):
+            name = "Panel2 corrected"
+
+        if (name == "Panel3"):
+            name = "Panel3 corrected"
+
         plt.scatter(projected_centers[:,0], projected_centers[:,1], 
-                    label=dataset_names[idx],
+                    label=name,
                     marker=markers[idx % len(markers)],
                     color=colors[idx],
                     s=100)
@@ -71,16 +78,19 @@ def plot_cluster_centers_pca(data_list, K, dataset_names=None):
     plt.title('Projected Cluster Centers of Datasets')
     plt.legend()
     plt.tight_layout()
-    plt.savefig('cluster_centers_pca.png')
+    if filename is None:
+        plt.savefig('cluster_centers_pca.png')
+    else:
+        plt.savefig(f'{filename}_cluster_centers_pca.png')
     plt.close()
     print("Plot saved as 'cluster_centers_pca.png'.")
 
 
 if __name__ == "__main__":
     dataset = "Synthetic"
-    directory = "CytoRUV"
+    directory = "LL_AE"
 
-    batches = ["Panel1", "Panel2", "Panel3"]
+    batches = ["Panel1", "Panel3", "Panel3 uncorrected"]
     data_list = []
     names = []
     for batch in batches:
@@ -89,4 +99,4 @@ if __name__ == "__main__":
         data_list.append(data)
         names.append(batch)
 
-    plot_cluster_centers_pca(data_list, K=13, dataset_names=names)
+    plot_cluster_centers_pca(data_list, K=13, dataset_names=names, filename=directory)
