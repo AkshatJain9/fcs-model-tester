@@ -108,7 +108,7 @@ def plot_fluoro_hist_compare(data_list, names=None, idx=None, synth_batch=True, 
 
 if __name__ == "__main__":
     dataset = "Synthetic"
-    directory = "LL_AE"
+    directory = "Spline_AE"
 
     batches = ["Panel1", "Panel3", "Panel3 uncorrected"]
     # batches= ["Panel1", "Panel3"]
@@ -121,4 +121,4 @@ if __name__ == "__main__":
         names.append(batch)
 
     # plot_fluoro_hist_compare(data_list, names, synth_batch=True, file_name=directory)
-    plot_fluoro_hist_compare(data_list, idx=7, names=names, synth_batch=True, file_name=directory)
+    plot_fluoro_hist_compare(data_list, idx=14, names=names, synth_batch=True, file_name=directory)

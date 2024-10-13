@@ -120,9 +120,9 @@ def plot_twod(data_list, i, j, synth_batch=True, labels=None):
                 
 if __name__ == '__main__':
     dataset = "Synthetic"
-    directory = "CytoRUV"
+    directory = "cytonorm"
 
-    batches = ["Panel1", "Panel2", "Panel3"]
+    batches = ["Panel1", "Panel2", "Panel2 uncorrected"]
     data_list = []
     names = []
     for batch in batches:
@@ -131,4 +131,4 @@ if __name__ == '__main__':
         data_list.append(data)
         names.append(batch)
 
-    plot_twod(data_list, 6, 7, synth_batch=True, labels=names)
+    plot_twod(data_list, 5, 9, synth_batch=True, labels=names)
