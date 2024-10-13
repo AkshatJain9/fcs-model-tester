@@ -22,7 +22,7 @@ all_channels = scatter_channels + fluro_channels
 transform = fk.transforms.LogicleTransform('logicle', param_t=262144, param_w=0.5, param_m=4.5, param_a=0)
 
 dataset = "Synthetic"
-processing_type = "testing"
+processing_type = "CytofBatchAdjust"
 
 if (platform.system() == "Windows"):
     somepath = ".\\" + dataset + "\\" + processing_type + "\\"
@@ -252,56 +252,56 @@ def compute_all_metrics(reference_batch, target_batches):
         file.write("\n-------------------------\n")
 
         # Mean Summary for all batches
-        # file.write("Mean Summaries:\n")
-        # mean1 = print_mean_summary(reference_batch)
-        # file.write("Mean Summary Reference Dataset:\n" + str(mean1) + "\n")
+        file.write("Mean Summaries:\n")
+        mean1 = print_mean_summary(reference_batch)
+        file.write("Mean Summary Reference Dataset:\n" + str(mean1) + "\n")
 
-        # for batch_name, target_batch in target_batches.items():
-        #     mean2 = print_mean_summary(target_batch)
-        #     file.write(f"Mean Summary {batch_name}:\n" + str(mean2) + "\n")
-        # file.write("\n-------------------------\n")
+        for batch_name, target_batch in target_batches.items():
+            mean2 = print_mean_summary(target_batch)
+            file.write(f"Mean Summary {batch_name}:\n" + str(mean2) + "\n")
+        file.write("\n-------------------------\n")
 
-        # # MSE Difference in Means for all batches
-        # file.write("MSE Difference in Means:\n")
-        # for batch_name, target_batch in target_batches.items():
-        #     mean2 = print_mean_summary(target_batch)
-        #     mean_diff = np.mean((mean1 - mean2)**2)
-        #     file.write(f"MSE Difference for {batch_name}: {mean_diff}\n")
-        # file.write("\n-------------------------\n")
+        # MSE Difference in Means for all batches
+        file.write("MSE Difference in Means:\n")
+        for batch_name, target_batch in target_batches.items():
+            mean2 = print_mean_summary(target_batch)
+            mean_diff = np.mean((mean1 - mean2)**2)
+            file.write(f"MSE Difference for {batch_name}: {mean_diff}\n")
+        file.write("\n-------------------------\n")
 
-        # # Std Summary for all batches
-        # file.write("Std Summaries:\n")
-        # std1 = print_std_summary(reference_batch)
-        # file.write("Std Summary Reference Dataset:\n" + str(std1) + "\n")
+        # Std Summary for all batches
+        file.write("Std Summaries:\n")
+        std1 = print_std_summary(reference_batch)
+        file.write("Std Summary Reference Dataset:\n" + str(std1) + "\n")
 
-        # for batch_name, target_batch in target_batches.items():
-        #     std2 = print_std_summary(target_batch)
-        #     file.write(f"Std Summary {batch_name}:\n" + str(std2) + "\n")
-        # file.write("\n-------------------------\n")
+        for batch_name, target_batch in target_batches.items():
+            std2 = print_std_summary(target_batch)
+            file.write(f"Std Summary {batch_name}:\n" + str(std2) + "\n")
+        file.write("\n-------------------------\n")
 
-        # # MSE Difference in Std for all batches
-        # file.write("MSE Difference in Standard Deviations:\n")
-        # for batch_name, target_batch in target_batches.items():
-        #     std2 = print_std_summary(target_batch)
-        #     std_diff = np.mean((std1 - std2)**2)
-        #     file.write(f"MSE Difference for {batch_name}: {std_diff}\n")
-        # file.write("\n-------------------------\n")
+        # MSE Difference in Std for all batches
+        file.write("MSE Difference in Standard Deviations:\n")
+        for batch_name, target_batch in target_batches.items():
+            std2 = print_std_summary(target_batch)
+            std_diff = np.mean((std1 - std2)**2)
+            file.write(f"MSE Difference for {batch_name}: {std_diff}\n")
+        file.write("\n-------------------------\n")
 
-        # # 1D TVD for all batches
-        # file.write("1D TVD for each feature:\n")
-        # for batch_name, target_batch in target_batches.items():
-        #     tvds = compute_all_tvd(reference_batch, target_batch)
-        #     file.write(f"1D TVD for {batch_name}:\n" + str(tvds) + "\n")
-        #     file.write(f"Mean 1D TVD for {batch_name}:\n" + str(np.mean(tvds)) + "\n")
-        # file.write("\n-------------------------\n")
+        # 1D TVD for all batches
+        file.write("1D TVD for each feature:\n")
+        for batch_name, target_batch in target_batches.items():
+            tvds = compute_all_tvd(reference_batch, target_batch)
+            file.write(f"1D TVD for {batch_name}:\n" + str(tvds) + "\n")
+            file.write(f"Mean 1D TVD for {batch_name}:\n" + str(np.mean(tvds)) + "\n")
+        file.write("\n-------------------------\n")
 
-        # # 2D TVD for all batches
-        # file.write("2D TVD for each feature pair:\n")
-        # for batch_name, target_batch in target_batches.items():
-        #     tvds_fluoro = compute_all_tvd_2d(reference_batch, target_batch)
-        #     file.write(f"2D TVD for {batch_name}:\n" + str(tvds_fluoro) + "\n")
-        #     file.write(f"Mean 2D TVD for {batch_name}:\n" + str(np.mean(tvds_fluoro)) + "\n")
-        # file.write("\n-------------------------\n")
+        # 2D TVD for all batches
+        file.write("2D TVD for each feature pair:\n")
+        for batch_name, target_batch in target_batches.items():
+            tvds_fluoro = compute_all_tvd_2d(reference_batch, target_batch)
+            file.write(f"2D TVD for {batch_name}:\n" + str(tvds_fluoro) + "\n")
+            file.write(f"Mean 2D TVD for {batch_name}:\n" + str(np.mean(tvds_fluoro)) + "\n")
+        file.write("\n-------------------------\n")
 
         # Cluster Distance for all batches
         file.write("Average Cluster Distance:\n")
@@ -410,13 +410,23 @@ if __name__ == "__main__":
 
     # compute_all_metrics(b1, d)
 
+    # b1 = load_data("Panel1")
+    # b2 = load_data("Panel1_sinkhorn_vr_clust13")
+
+    # d = dict()
+    # d["Panel 1 Sink"] = b2
+
+    # compute_all_metrics(b1, d)
     b1 = load_data("Panel1")
-    b2 = load_data("Panel1_sinkhorn_vr_clust13")
+    b2 = load_data("Panel2")
+    b3 = load_data("Panel3")
 
     d = dict()
-    d["Panel 1 Sink"] = b2
+    d["Panel 2"] = b2
+    d["Panel 3"] = b3
 
     compute_all_metrics(b1, d)
+
 
     # b2 = load_data("Panel1_sink_final")
     # find_optimal_k(b2, 15)
