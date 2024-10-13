@@ -7,7 +7,7 @@ scatter_channels = ['FSC-A', 'FSC-H', 'FSC-W', 'SSC-A', 'SSC-H', 'SSC-W']
 fluro_channels_panel = ['CD8', 'B220', 'CD44', 'CD3', 'IgD', 'CD25', 'Ly6C', 'NK1.1', 'IgM / CD4', 'LD', 'CD19', 'CD62L']
 fluro_channels_enu = ['IgM', 'B2220', 'IgD', 'KLRG1', 'NK1.1', 'CD4', 'CD3', 'CD44', 'CD8']
 
-def plot_twod(data_list, i, j, synth_batch=True, labels=None):
+def plot_twod(data_list, i, j, synth_batch=True, labels=None, filename=None):
     """
     Plots contour and scatter plots for the selected channel pairing (i, j) 
     for all datasets in data_list.
@@ -57,7 +57,7 @@ def plot_twod(data_list, i, j, synth_batch=True, labels=None):
     
     # Choose a single contour level to show the general shape
     density_values = density_grid.flatten()
-    contour_level = np.percentile(density_values, 75)  # Adjust percentile as needed
+    contour_level = np.percentile(density_values, 90)  # Adjust percentile as needed
     
     # Now, loop over datasets to create individual plots
     for idx, data in enumerate(data_list):
@@ -113,16 +113,19 @@ def plot_twod(data_list, i, j, synth_batch=True, labels=None):
         plt.tight_layout()
         
         # Save the figure for this dataset with high resolution
-        plt.savefig(f'{data_name}_channels_{channel_list[i]}_{channel_list[j]}.png', dpi=300, bbox_inches='tight')
+        if filename is not None:
+            plt.savefig(f'z{filename}_{data_name}_{channel_list[i]}_{channel_list[j]}.png', dpi=300, bbox_inches='tight')
+        else:
+            plt.savefig(f'{data_name}_{channel_list[i]}_{channel_list[j]}.png', dpi=300, bbox_inches='tight')
         plt.close()
 
 
                 
 if __name__ == '__main__':
     dataset = "Synthetic"
-    directory = "cytonorm"
+    directory = "Spline_AE"
 
-    batches = ["Panel1", "Panel2", "Panel2 uncorrected"]
+    batches = ["Panel1", "Panel3", "Panel3 uncorrected"]
     data_list = []
     names = []
     for batch in batches:
@@ -131,4 +134,4 @@ if __name__ == '__main__':
         data_list.append(data)
         names.append(batch)
 
-    plot_twod(data_list, 5, 9, synth_batch=True, labels=names)
+    plot_twod(data_list, 7, 8, synth_batch=True, labels=names, filename=directory)
