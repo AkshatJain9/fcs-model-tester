@@ -121,4 +121,4 @@ if __name__ == "__main__":
         names.append(batch)
 
     # plot_fluoro_hist_compare(data_list, names, synth_batch=True, file_name=directory)
-    plot_fluoro_hist_compare(data_list, idx=14, names=names, synth_batch=True, file_name=directory)
+    plot_fluoro_hist_compare(data_list, names=names, synth_batch=True, file_name=directory)

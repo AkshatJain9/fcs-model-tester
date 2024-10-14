@@ -123,7 +123,7 @@ def plot_twod(data_list, i, j, synth_batch=True, labels=None, filename=None):
                 
 if __name__ == '__main__':
     dataset = "Synthetic"
-    directory = "Spline_AE"
+    directory = "ClusAlign_AE"
 
     batches = ["Panel1", "Panel3", "Panel3 uncorrected"]
     data_list = []
