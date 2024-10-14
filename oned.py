@@ -105,11 +105,28 @@ def plot_fluoro_hist_compare(data_list, names=None, idx=None, synth_batch=True, 
 
 
 if __name__ == "__main__":
-    dataset = "Synthetic"
-    directory = "Spline_AE"
+    ########## SYNTHETIC BATCHES ##########
+    # dataset = "Synthetic"
+    # directory = "Spline_AE"
 
-    batches = ["Panel1", "Panel3", "Panel3 uncorrected"]
-    # batches= ["Panel1", "Panel3"]
+    # batches = ["Panel1", "Panel3", "Panel3 uncorrected"]
+    # # batches= ["Panel1", "Panel3"]
+    # data_list = []
+    # names = []
+    # for batch in batches:
+    #     filename = f"{dataset}/{directory}/{batch}.npy"
+    #     data = np.load(filename)
+    #     data_list.append(data)
+    #     names.append(batch)
+
+    # # plot_fluoro_hist_compare(data_list, names, synth_batch=True, file_name=directory)
+    # plot_fluoro_hist_compare(data_list, names=names, synth_batch=True, file_name=directory)
+
+    ########## ENU BATCHES ##########
+    dataset = "ENU"
+    directory = "COMBAT_27902_N"
+    # batches = ["Plate 19635_CD8", "Plate 27902_N", "Plate 28332", "Plate 28528_N", "Plate 29178_N", "Plate 36841", "Plate 39630_N"]
+    batches = ["Plate 27902_N", "Plate 19635_CD8", "Plate 28332", "Plate 28528_N", "Plate 29178_N", "Plate 36841", "Plate 39630_N"]
     data_list = []
     names = []
     for batch in batches:
@@ -118,5 +135,4 @@ if __name__ == "__main__":
         data_list.append(data)
         names.append(batch)
 
-    # plot_fluoro_hist_compare(data_list, names, synth_batch=True, file_name=directory)
-    plot_fluoro_hist_compare(data_list, names=names, synth_batch=True, file_name=directory)
+    plot_fluoro_hist_compare(data_list, names=names, synth_batch=False, file_name=directory)
