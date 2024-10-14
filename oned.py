@@ -87,8 +87,6 @@ def plot_fluoro_hist_compare(data_list, names=None, idx=None, synth_batch=True, 
             else:
                 data_name = f'Dataset {dataset_idx+1}'
 
-            if (data_name == "Panel3"):
-                data_name = "Panel3 Corrected"
             hist, bin_edges = generate_histogram(data, channel_index, min_val, max_val)
             ax.plot(bin_edges[:-1], hist, label=data_name, color=colors[dataset_idx])
 
