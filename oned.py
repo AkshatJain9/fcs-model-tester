@@ -124,16 +124,27 @@ if __name__ == "__main__":
 
     ########## ENU BATCHES ##########
     dataset = "ENU"
-    directory = "COMBAT_27902_N"
+    directory = "AE_LL_27902"
     # batches = ["Plate 19635_CD8", "Plate 27902_N", "Plate 28332", "Plate 28528_N", "Plate 29178_N", "Plate 36841", "Plate 39630_N"]
     # batches = ["Plate 27902_N", "Plate 19635_CD8", "Plate 28332", "Plate 28528_N", "Plate 29178_N", "Plate 36841", "Plate 39630_N"]
     batches = ["Plate 27902_N", "Plate 28528_N"]
     data_list = []
     names = []
-    for batch in batches:
+    for i, batch in enumerate(batches):
         filename = f"{dataset}/{directory}/{batch}.npy"
         data = np.load(filename)
         data_list.append(data)
-        names.append(batch)
+        if (i == 0):
+            names.append(batch)
+        else:
+            names.append(batch + " Corrected")
 
-    plot_fluoro_hist_compare(data_list, idx=8, names=names, synth_batch=False, file_name=f"{directory}")
+    raw_data_batches = batches[1:]
+    for batch in raw_data_batches:
+        filename = f"{dataset}/rawdata/{batch}.npy"
+        data = np.load(filename)
+        data_list.append(data)
+        names.append(batch + " Uncorrected")
+
+
+    plot_fluoro_hist_compare(data_list, idx=7, names=names, synth_batch=False, file_name=f"{directory}")
