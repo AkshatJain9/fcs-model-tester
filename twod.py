@@ -123,17 +123,20 @@ def plot_twod(data_list, i, j, synth_batch=True, labels=None, filename=None):
                 
 if __name__ == '__main__':
     dataset = "ENU"
-    directory = "AE_LL_27902"
+    directory = "AE_EmpBayes_27902"
 
     # batches = ["Panel1", "Panel3", "Panel3 uncorrected"]
     # batches = ["Plate 19635_CD8", "Plate 27902_N", "Plate 28332", "Plate 28528_N", "Plate 29178_N", "Plate 36841", "Plate 39630_N"]
-    batches = ["Plate 27902_N", "Plate 29178_N", "Plate 29178_N uncorrected"]
+    batches = ["Plate 27902_N", "Plate 28528_N", "Plate 28528_N uncorrected", "Plate 28528_N LL"]
     data_list = []
     names = []
     for batch in batches:
         if ("uncorrected" in batch):
             batch_name = batch.replace(" uncorrected", "")
             filename = f"{dataset}/rawdata/{batch_name}.npy"
+        elif ("LL" in batch):
+            batch_name = batch.replace(" LL", "")
+            filename = f"{dataset}/AE_LL_CD8/{batch_name}.npy"
         else:
             filename = f"{dataset}/{directory}/{batch}.npy"
         data = np.load(filename)
@@ -141,4 +144,4 @@ if __name__ == '__main__':
         
         names.append(batch)
 
-    plot_twod(data_list, 8, 6, synth_batch=False, labels=names, filename=directory)
+    plot_twod(data_list, 6, 7, synth_batch=False, labels=names, filename=directory)
