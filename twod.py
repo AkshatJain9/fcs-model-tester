@@ -5,7 +5,7 @@ from scipy.stats import gaussian_kde
 
 scatter_channels = ['FSC-A', 'FSC-H', 'FSC-W', 'SSC-A', 'SSC-H', 'SSC-W']
 fluro_channels_panel = ['CD8', 'B220', 'CD44', 'CD3', 'IgD', 'CD25', 'Ly6C', 'NK1.1', 'IgM / CD4', 'LD', 'CD19', 'CD62L']
-fluro_channels_enu = ['IgM', 'B2220', 'IgD', 'KLRG1', 'NK1.1', 'CD4', 'CD3', 'CD44', 'CD8']
+fluro_channels_enu = ['IgM', 'B220', 'IgD', 'KLRG1', 'NK1.1', 'CD4', 'CD3', 'CD44', 'CD8']
 
 def plot_twod(data_list, i, j, synth_batch=True, labels=None, filename=None):
     """
@@ -114,7 +114,7 @@ def plot_twod(data_list, i, j, synth_batch=True, labels=None, filename=None):
         
         # Save the figure for this dataset with high resolution
         if filename is not None:
-            plt.savefig(f'z{filename}_{data_name}_{channel_list[i]}_{channel_list[j]}.png', dpi=300, bbox_inches='tight')
+            plt.savefig(f'{filename}_{data_name}_{channel_list[i]}_{channel_list[j]}.png', dpi=300, bbox_inches='tight')
         else:
             plt.savefig(f'{data_name}_{channel_list[i]}_{channel_list[j]}.png', dpi=300, bbox_inches='tight')
         plt.close()
@@ -122,16 +122,23 @@ def plot_twod(data_list, i, j, synth_batch=True, labels=None, filename=None):
 
                 
 if __name__ == '__main__':
-    dataset = "Synthetic"
-    directory = "ClusAlign_AE"
+    dataset = "ENU"
+    directory = "AE_LL_27902"
 
-    batches = ["Panel1", "Panel3", "Panel3 uncorrected"]
+    # batches = ["Panel1", "Panel3", "Panel3 uncorrected"]
+    # batches = ["Plate 19635_CD8", "Plate 27902_N", "Plate 28332", "Plate 28528_N", "Plate 29178_N", "Plate 36841", "Plate 39630_N"]
+    batches = ["Plate 27902_N", "Plate 29178_N", "Plate 29178_N uncorrected"]
     data_list = []
     names = []
     for batch in batches:
-        filename = f"{dataset}/{directory}/{batch}.npy"
+        if ("uncorrected" in batch):
+            batch_name = batch.replace(" uncorrected", "")
+            filename = f"{dataset}/rawdata/{batch_name}.npy"
+        else:
+            filename = f"{dataset}/{directory}/{batch}.npy"
         data = np.load(filename)
         data_list.append(data)
+        
         names.append(batch)
 
-    plot_twod(data_list, 7, 8, synth_batch=True, labels=names, filename=directory)
+    plot_twod(data_list, 8, 6, synth_batch=False, labels=names, filename=directory)
