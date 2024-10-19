@@ -57,7 +57,7 @@ def plot_twod(data_list, i, j, synth_batch=True, labels=None, filename=None):
     
     # Choose a single contour level to show the general shape
     density_values = density_grid.flatten()
-    contour_level = np.percentile(density_values, 90)  # Adjust percentile as needed
+    contour_level = np.percentile(density_values, 75)  # Adjust percentile as needed
     
     # Now, loop over datasets to create individual plots
     for idx, data in enumerate(data_list):
@@ -123,11 +123,11 @@ def plot_twod(data_list, i, j, synth_batch=True, labels=None, filename=None):
                 
 if __name__ == '__main__':
     dataset = "ENU"
-    directory = "AE_EmpBayes_27902"
+    directory = "AE_ClusAlign_27902"
 
     # batches = ["Panel1", "Panel3", "Panel3 uncorrected"]
     # batches = ["Plate 19635_CD8", "Plate 27902_N", "Plate 28332", "Plate 28528_N", "Plate 29178_N", "Plate 36841", "Plate 39630_N"]
-    batches = ["Plate 27902_N", "Plate 28528_N", "Plate 28528_N uncorrected", "Plate 28528_N LL"]
+    batches = ["Plate 27902_N", "Plate 19635_CD8", "Plate 19635_CD8 uncorrected"]
     data_list = []
     names = []
     for batch in batches:
@@ -144,4 +144,4 @@ if __name__ == '__main__':
         
         names.append(batch)
 
-    plot_twod(data_list, 6, 7, synth_batch=False, labels=names, filename=directory)
+    plot_twod(data_list, 10, 14, synth_batch=False, labels=names, filename=directory)
