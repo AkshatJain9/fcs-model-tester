@@ -124,10 +124,10 @@ if __name__ == "__main__":
 
     ########## ENU BATCHES ##########
     dataset = "ENU"
-    directory = "AE_ClusAlign_27902"
+    directory = "Spline_Raw_CD8"
     # batches = ["Plate 19635_CD8", "Plate 27902_N", "Plate 28332", "Plate 28528_N", "Plate 29178_N", "Plate 36841", "Plate 39630_N"]
     # batches = ["Plate 27902_N", "Plate 19635_CD8", "Plate 28332", "Plate 28528_N", "Plate 29178_N", "Plate 36841", "Plate 39630_N"]
-    batches = ["Plate 27902_N", "Plate 39630_N"]
+    batches = ["Plate 19635_CD8", "Plate 28528_N"]
     data_list = []
     names = []
     for i, batch in enumerate(batches):
@@ -147,4 +147,4 @@ if __name__ == "__main__":
         names.append(batch + " Uncorrected")
 
 
-    plot_fluoro_hist_compare(data_list, idx=9, names=names, synth_batch=False, file_name=f"{directory}")
+    plot_fluoro_hist_compare(data_list, idx=6, names=names, synth_batch=False, file_name=f"{directory}")
